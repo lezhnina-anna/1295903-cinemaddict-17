@@ -1,7 +1,7 @@
 # Проект «Киноман»
 
 * Студент: [Аня Лежнина](https://up.htmlacademy.ru/ecmascript/17/user/1295903).
-* Наставник: `Неизвестно`.
+* Наставник: [Глеб Клецков](https://htmlacademy.ru/profile/id1487865).
 
 ---
 
