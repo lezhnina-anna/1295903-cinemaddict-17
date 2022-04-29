@@ -1,4 +1,4 @@
-import {createElement} from '../render.js';
+import View from './view';
 
 const createFilterTemplate = () => `<ul class="sort">
     <li><a href="#" class="sort__button sort__button--active">Sort by default</a></li>
@@ -6,20 +6,8 @@ const createFilterTemplate = () => `<ul class="sort">
     <li><a href="#" class="sort__button">Sort by rating</a></li>
   </ul>`;
 
-export default class FilterView {
-  getTemplate() {
-    return createFilterTemplate();
-  }
-
-  getElement() {
-    if (!this.element) {
-      this.element = createElement(this.getTemplate());
-    }
-
-    return this.element;
-  }
-
-  removeElement() {
-    this.element = null;
+export default class FilterView extends View {
+  constructor() {
+    super(createFilterTemplate);
   }
 }

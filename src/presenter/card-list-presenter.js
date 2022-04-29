@@ -5,6 +5,7 @@ import FilterView from '../view/filter-view';
 import CardView from '../view/card-view';
 import CardListSectionView from '../view/card-list-section-view';
 import PopupView from '../view/popup-view';
+import ShowMoreButtonView from '../view/show-more-button-view';
 
 export default class CardListPresenter {
   LINE_CARDS_COUNT = 5;
@@ -21,5 +22,7 @@ export default class CardListPresenter {
     for (let i = 0; i < this.LINE_CARDS_COUNT; i++) {
       render(new CardView(), this.cardListComponent.getElement());
     }
+
+    render(new ShowMoreButtonView(), this.cardListSectionComponent.getElement());
   };
 }
