@@ -8,12 +8,12 @@ const getMoviesData = () => {
 
   for (const movie of movies) {
     const count = getRandomInteger(0, comments.length - 1);
-    [...Array(count).keys()].forEach(() => {
+    for (let i = 0; i < count; i++) {
       const randomId = comments[getRandomInteger(0, comments.length - 1)].id;
       if (!movie.comments.includes(randomId)) {
         movie.comments.push(randomId);
       }
-    });
+    }
   }
 
   return {movies, comments};
