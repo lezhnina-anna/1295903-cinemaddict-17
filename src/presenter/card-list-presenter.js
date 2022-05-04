@@ -9,23 +9,59 @@ import ShowMoreButtonView from '../view/show-more-button-view';
 
 export default class CardListPresenter {
   LINE_CARDS_COUNT = 5;
-  cardListComponent = new CardListView();
-  cardListSectionComponent = new CardListSectionView();
+  #movies = [];
+  #comments = [];
+
+  #cardListContainer = null;
+  #cardListComponent = new CardListView();
+  #cardListSectionComponent = new CardListSectionView();
 
   init = (cardListContainer, moviesData) => {
-    this.movies = moviesData.movies;
-    this.comments = moviesData.comments;
+    this.#movies = moviesData.movies;
+    this.#comments = moviesData.comments;
+    this.#cardListContainer = cardListContainer;
 
-    render(new NavigationView(), cardListContainer);
-    render(new FilterView(), cardListContainer);
-    render(this.cardListSectionComponent, cardListContainer);
-    render(this.cardListComponent, this.cardListSectionComponent.getElement());
-    render(new PopupView(this.movies[0], this.comments), document.body);
+    render(new NavigationView(), this.#cardListContainer);
+    render(new FilterView(), this.#cardListContainer);
+    render(this.#cardListSectionComponent, this.#cardListContainer);
+    render(this.#cardListComponent, this.#cardListSectionComponent.element);
 
-    for (let i = 0; i < this.LINE_CARDS_COUNT; i++) {
-      render(new CardView(this.movies[i]), this.cardListComponent.getElement());
+    for (let i = 0; i < Math.min(this.#movies.length, this.LINE_CARDS_COUNT); i++) {
+      this.#renderMovie(this.#movies[i]);
     }
 
-    render(new ShowMoreButtonView(), this.cardListSectionComponent.getElement());
+    render(new ShowMoreButtonView(), this.#cardListSectionComponent.element);
+  };
+
+  #renderMovie = (movie) => {
+    const POPUP_OPEN_CLASSNAME = 'hide-overflow';
+    const movieComponent = new CardView(movie);
+    const popupComponent = new PopupView(movie, this.#comments);
+
+    const closePopup = () => {
+      document.body.classList.remove(POPUP_OPEN_CLASSNAME);
+      document.body.removeChild(popupComponent.element);
+      popupComponent.removeElement();
+    };
+
+    const onEscKeyDown = (evt) => {
+      if (evt.key === 'Escape' || evt.key === 'Esc') {
+        evt.preventDefault();
+        closePopup();
+        document.removeEventListener('keydown', onEscKeyDown);
+      }
+    };
+
+    const openPopup = () => {
+      document.body.appendChild(popupComponent.element);
+      document.body.classList.add(POPUP_OPEN_CLASSNAME);
+
+      document.addEventListener('keydown', onEscKeyDown);
+      popupComponent.element.querySelector('.film-details__close-btn').addEventListener('click', closePopup);
+    };
+
+    movieComponent.element.querySelector('.film-card__link').addEventListener('click', openPopup);
+
+    render(movieComponent, this.#cardListComponent.element);
   };
 }
