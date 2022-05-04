@@ -12,15 +12,18 @@ export default class CardListPresenter {
   cardListComponent = new CardListView();
   cardListSectionComponent = new CardListSectionView();
 
-  init = (cardListContainer) => {
+  init = (cardListContainer, moviesData) => {
+    this.movies = moviesData.movies;
+    this.comments = moviesData.comments;
+
     render(new NavigationView(), cardListContainer);
     render(new FilterView(), cardListContainer);
     render(this.cardListSectionComponent, cardListContainer);
     render(this.cardListComponent, this.cardListSectionComponent.getElement());
-    render(new PopupView(), document.body);
+    render(new PopupView(this.movies[0], this.comments), document.body);
 
     for (let i = 0; i < this.LINE_CARDS_COUNT; i++) {
-      render(new CardView(), this.cardListComponent.getElement());
+      render(new CardView(this.movies[i]), this.cardListComponent.getElement());
     }
 
     render(new ShowMoreButtonView(), this.cardListSectionComponent.getElement());
