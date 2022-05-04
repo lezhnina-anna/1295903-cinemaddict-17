@@ -1,23 +1,26 @@
 import {createElement} from '../render';
 
 export default class View {
+  #element = null;
+  #createTemplate = () => void 0;
+
   constructor(createTemplate) {
-    this.createTemplate = createTemplate;
+    this.#createTemplate = createTemplate;
   }
 
-  getElement() {
-    if (!this.element) {
-      this.element = createElement(this.getTemplate());
+  get element() {
+    if (!this.#element) {
+      this.#element = createElement(this.template);
     }
 
-    return this.element;
+    return this.#element;
   }
 
-  getTemplate() {
-    return this.createTemplate();
+  get template() {
+    return this.#createTemplate();
   }
 
   removeElement() {
-    this.element = null;
+    this.#element = null;
   }
 }
