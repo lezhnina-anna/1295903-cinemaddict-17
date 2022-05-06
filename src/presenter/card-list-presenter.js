@@ -7,6 +7,7 @@ import CardListSectionView from '../view/card-list-section-view';
 import PopupView from '../view/popup-view';
 import ShowMoreButtonView from '../view/show-more-button-view';
 import MoviesTitleView from '../view/movies-title-view';
+import {isEscapeKey} from "../util";
 
 const LINE_CARDS_COUNT = 5;
 
@@ -26,7 +27,6 @@ export default class CardListPresenter {
     this.#moviesData = moviesData;
     this.#cardListContainer = cardListContainer;
   }
-
 
   init = () => {
     this.#movies = [...this.#moviesData.movies];
@@ -63,7 +63,7 @@ export default class CardListPresenter {
     };
 
     const onEscKeyDown = (evt) => {
-      if (evt.key === 'Escape' || evt.key === 'Esc') {
+      if (isEscapeKey(evt)) {
         evt.preventDefault();
         closePopup();
         document.removeEventListener('keydown', onEscKeyDown);
@@ -94,7 +94,8 @@ export default class CardListPresenter {
     render(new MoviesTitleView(this.#isEmptyList), this.#cardListSectionComponent.element);
     render(this.#cardListComponent, this.#cardListSectionComponent.element);
 
-    for (let i = 0; i < Math.min(this.#movies.length, LINE_CARDS_COUNT); i++) {
+    const cardListLength = Math.min(this.#movies.length, LINE_CARDS_COUNT);
+    for (let i = 0; i < cardListLength; i++) {
       this.#renderMovie(this.#movies[i]);
     }
 

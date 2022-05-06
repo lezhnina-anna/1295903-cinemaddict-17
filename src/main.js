@@ -10,4 +10,3 @@ const cardListPresenter = new CardListPresenter(siteMainElement, moviesData);
 
 render(new UserView(), siteHeaderElement);
 cardListPresenter.init();
-
