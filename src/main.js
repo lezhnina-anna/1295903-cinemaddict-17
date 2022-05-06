@@ -5,9 +5,9 @@ import {getMoviesData} from './data';
 
 const siteMainElement = document.querySelector('.main');
 const siteHeaderElement = document.querySelector('.header');
-const cardListPresenter = new CardListPresenter();
 const moviesData = getMoviesData();
+const cardListPresenter = new CardListPresenter(siteMainElement, moviesData);
 
 render(new UserView(), siteHeaderElement);
-cardListPresenter.init(siteMainElement, moviesData);
+cardListPresenter.init();
 

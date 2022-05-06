@@ -11,40 +11,29 @@ import MoviesTitleView from '../view/movies-title-view';
 const LINE_CARDS_COUNT = 5;
 
 export default class CardListPresenter {
+  #moviesData = {};
   #movies = [];
   #comments = [];
   #renderedCardCount = LINE_CARDS_COUNT;
+  #isEmptyList = true;
 
   #cardListContainer = null;
   #cardListComponent = new CardListView();
   #cardListSectionComponent = new CardListSectionView();
   #loadMoreButtonComponent = new ShowMoreButtonView();
 
-  init = (cardListContainer, moviesData) => {
-    this.#movies = moviesData.movies;
-    this.#comments = moviesData.comments;
+  constructor(cardListContainer, moviesData) {
+    this.#moviesData = moviesData;
     this.#cardListContainer = cardListContainer;
-    const isEmptyList = this.#movies.length === 0;
+  }
 
-    render(new NavigationView(), this.#cardListContainer);
 
-    if (!isEmptyList) {
-      render(new FilterView(), this.#cardListContainer);
-    }
+  init = () => {
+    this.#movies = [...this.#moviesData.movies];
+    this.#comments = [...this.#moviesData.comments];
+    this.#isEmptyList = this.#movies.length === 0;
 
-    render(this.#cardListSectionComponent, this.#cardListContainer);
-    render(new MoviesTitleView(isEmptyList), this.#cardListSectionComponent.element);
-    render(this.#cardListComponent, this.#cardListSectionComponent.element);
-
-    for (let i = 0; i < Math.min(this.#movies.length, LINE_CARDS_COUNT); i++) {
-      this.#renderMovie(this.#movies[i]);
-    }
-
-    if (this.#movies.length > LINE_CARDS_COUNT) {
-      render(this.#loadMoreButtonComponent, this.#cardListSectionComponent.element);
-
-      this.#loadMoreButtonComponent.element.addEventListener('click', this.#handleLoadMoreButtonClick);
-    }
+    this.#renderCardList();
   };
 
   #handleLoadMoreButtonClick = (evt) => {
@@ -92,5 +81,27 @@ export default class CardListPresenter {
     movieComponent.element.querySelector('.film-card__link').addEventListener('click', openPopup);
 
     render(movieComponent, this.#cardListComponent.element);
+  };
+
+  #renderCardList = () => {
+    render(new NavigationView(), this.#cardListContainer);
+
+    if (!this.#isEmptyList) {
+      render(new FilterView(), this.#cardListContainer);
+    }
+
+    render(this.#cardListSectionComponent, this.#cardListContainer);
+    render(new MoviesTitleView(this.#isEmptyList), this.#cardListSectionComponent.element);
+    render(this.#cardListComponent, this.#cardListSectionComponent.element);
+
+    for (let i = 0; i < Math.min(this.#movies.length, LINE_CARDS_COUNT); i++) {
+      this.#renderMovie(this.#movies[i]);
+    }
+
+    if (this.#movies.length > LINE_CARDS_COUNT) {
+      render(this.#loadMoreButtonComponent, this.#cardListSectionComponent.element);
+
+      this.#loadMoreButtonComponent.element.addEventListener('click', this.#handleLoadMoreButtonClick);
+    }
   };
 }
