@@ -36,4 +36,15 @@ const generateDate = (minDaysGap, maxDaysGap) => {
   return dayjs().add(daysGap, 'day').toDate();
 };
 
-export {getRandomInteger, humanizeMovieDate, getUniqueValues, humanizeRuntime, formatDescription, generateDate, humanizeCommentDate};
+const isEscapeKey = (evt) => evt.key === 'Escape' || evt.key === 'Esc';
+
+export {
+  getRandomInteger,
+  humanizeMovieDate,
+  getUniqueValues,
+  humanizeRuntime,
+  formatDescription,
+  generateDate,
+  humanizeCommentDate,
+  isEscapeKey
+};
