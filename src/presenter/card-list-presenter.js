@@ -7,7 +7,7 @@ import CardListSectionView from '../view/card-list-section-view';
 import PopupView from '../view/popup-view';
 import ShowMoreButtonView from '../view/show-more-button-view';
 import MoviesTitleView from '../view/movies-title-view';
-import {isEscapeKey} from "../util";
+import {isEscapeKey} from '../util';
 
 const LINE_CARDS_COUNT = 5;
 
