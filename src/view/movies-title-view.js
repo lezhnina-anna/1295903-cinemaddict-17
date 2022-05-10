@@ -1,4 +1,4 @@
-import View from './view';
+import AbstractView from '../framework/view/abstract-view';
 
 const createMoviesTitleTemplate = (isEmpty, filter) => {
   if (!isEmpty) {
@@ -25,8 +25,17 @@ const createMoviesTitleTemplate = (isEmpty, filter) => {
   return `<h2 class="films-list__title">${moviesTitleText}</h2>`;
 };
 
-export default class MoviesTitleView extends View {
+export default class MoviesTitleView extends AbstractView {
+  #isEmpty = false;
+  #filter = '';
+
   constructor(isEmpty = false, filter = '') {
-    super(() => createMoviesTitleTemplate(isEmpty, filter));
+    super();
+    this.#isEmpty = isEmpty;
+    this.#filter = filter;
+  }
+
+  get template() {
+    return createMoviesTitleTemplate(this.#isEmpty, this.#filter);
   }
 }

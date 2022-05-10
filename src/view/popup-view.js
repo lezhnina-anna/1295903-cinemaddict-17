@@ -1,5 +1,5 @@
-import View from './view';
 import {humanizeMovieDate, humanizeRuntime, humanizeCommentDate} from '../util';
+import AbstractView from '../framework/view/abstract-view';
 
 const createGenresTemplate = (genres) => genres.map((genre) =>
   `<span class="film-details__genre">${genre}</span>`).join('');
@@ -174,9 +174,27 @@ const createPopupTemplate = (movie, commentsList) => {
 </section>`;
 };
 
-export default class PopupView extends View {
+export default class PopupView extends AbstractView {
+  #movie = null;
+  #comments = [];
+
   constructor(movie, comments) {
-    const currMovieComments = comments.filter((comment) => movie.comments.some((movieCommentId) => movieCommentId === comment.id));
-    super(() => createPopupTemplate(movie, currMovieComments));
+    super();
+    this.#comments = comments.filter((comment) => movie.comments.some((movieCommentId) => movieCommentId === comment.id));
+    this.#movie = movie;
   }
+
+  get template() {
+    return createPopupTemplate(this.#movie, this.#comments);
+  }
+
+  setCloseButtonClickHandler = (callback) => {
+    this._callback.closeButtonClick = callback;
+    this.element.querySelector('.film-details__close-btn').addEventListener('click', this.#closeButtonClickHandler);
+  };
+
+  #closeButtonClickHandler = (evt) => {
+    evt.preventDefault();
+    this._callback.closeButtonClick();
+  };
 }

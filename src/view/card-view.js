@@ -1,5 +1,5 @@
-import View from './view';
 import {formatDescription, humanizeRuntime} from '../util';
+import AbstractView from '../framework/view/abstract-view';
 
 const createCardTemplate = (movie) => {
   const MAX_DESCRIPTION_LENGTH = 140;
@@ -28,8 +28,25 @@ const createCardTemplate = (movie) => {
         </article>`;
 };
 
-export default class CardView extends View {
+export default class CardView extends AbstractView {
+  #movie = null;
+
   constructor(movie) {
-    super(() => createCardTemplate(movie));
+    super();
+    this.#movie = movie;
   }
+
+  get template() {
+    return createCardTemplate(this.#movie);
+  }
+
+  setClickHandler = (callback) => {
+    this._callback.click = callback;
+    this.element.querySelector('.film-card__link').addEventListener('click', this.#clickHandler);
+  };
+
+  #clickHandler = (evt) => {
+    evt.preventDefault();
+    this._callback.click();
+  };
 }
