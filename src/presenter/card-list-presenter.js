@@ -1,4 +1,4 @@
-import {render} from '../render';
+import {render} from '../framework/render';
 import CardListView from '../view/card-list-view';
 import NavigationView from '../view/navigation-view';
 import FilterView from '../view/filter-view';
@@ -36,9 +36,7 @@ export default class CardListPresenter {
     this.#renderCardList();
   };
 
-  #handleLoadMoreButtonClick = (evt) => {
-    evt.preventDefault();
-
+  #handleLoadMoreButtonClick = () => {
     this.#movies
       .slice(this.#renderedCardCount, this.#renderedCardCount + LINE_CARDS_COUNT)
       .forEach((movie) => this.#renderMovie(movie));
@@ -75,10 +73,10 @@ export default class CardListPresenter {
       document.body.classList.add(POPUP_OPEN_CLASSNAME);
 
       document.addEventListener('keydown', onEscKeyDown);
-      popupComponent.element.querySelector('.film-details__close-btn').addEventListener('click', closePopup);
+      popupComponent.setCloseButtonClickHandler(closePopup);
     };
 
-    movieComponent.element.querySelector('.film-card__link').addEventListener('click', openPopup);
+    movieComponent.setClickHandler(openPopup);
 
     render(movieComponent, this.#cardListComponent.element);
   };
@@ -102,7 +100,7 @@ export default class CardListPresenter {
     if (this.#movies.length > LINE_CARDS_COUNT) {
       render(this.#loadMoreButtonComponent, this.#cardListSectionComponent.element);
 
-      this.#loadMoreButtonComponent.element.addEventListener('click', this.#handleLoadMoreButtonClick);
+      this.#loadMoreButtonComponent.setClickHandler(this.#handleLoadMoreButtonClick);
     }
   };
 }

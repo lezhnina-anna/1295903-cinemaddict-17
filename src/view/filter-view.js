@@ -1,4 +1,4 @@
-import View from './view';
+import AbstractView from '../framework/view/abstract-view';
 
 const createFilterTemplate = () => `<ul class="sort">
     <li><a href="#" class="sort__button sort__button--active">Sort by default</a></li>
@@ -6,8 +6,8 @@ const createFilterTemplate = () => `<ul class="sort">
     <li><a href="#" class="sort__button">Sort by rating</a></li>
   </ul>`;
 
-export default class FilterView extends View {
-  constructor() {
-    super(createFilterTemplate);
+export default class FilterView extends AbstractView {
+  get template() {
+    return createFilterTemplate();
   }
 }

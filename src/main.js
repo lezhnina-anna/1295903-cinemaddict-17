@@ -1,4 +1,4 @@
-import {render} from './render';
+import {render} from './framework/render';
 import UserView from './view/user-view';
 import CardListPresenter from './presenter/card-list-presenter';
 import {getMoviesData} from './data';
