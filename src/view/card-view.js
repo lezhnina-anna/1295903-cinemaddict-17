@@ -1,6 +1,29 @@
 import {formatDescription, humanizeRuntime} from '../util';
 import AbstractView from '../framework/view/abstract-view';
 
+const createControlsTemplate = (userDetails) => {
+  const ACTIVE_CONTROL_CLASS = 'film-card__controls-item--active';
+  const {watchlist, alreadyWatched, favorite} = userDetails;
+
+  const watchlistClassName = watchlist
+    ? ACTIVE_CONTROL_CLASS
+    : '';
+
+  const watchedClassName = alreadyWatched
+    ? ACTIVE_CONTROL_CLASS
+    : '';
+
+  const favoriteClassName = favorite
+    ? ACTIVE_CONTROL_CLASS
+    : '';
+
+  return `<div class="film-card__controls">
+            <button class="film-card__controls-item film-card__controls-item--add-to-watchlist ${watchlistClassName}" type="button">Add to watchlist</button>
+            <button class="film-card__controls-item film-card__controls-item--mark-as-watched ${watchedClassName}" type="button">Mark as watched</button>
+            <button class="film-card__controls-item film-card__controls-item--favorite ${favoriteClassName}" type="button">Mark as favorite</button>
+          </div>`;
+};
+
 const createCardTemplate = (movie) => {
   const MAX_DESCRIPTION_LENGTH = 140;
   const {comments, filmInfo} = movie;
@@ -20,11 +43,7 @@ const createCardTemplate = (movie) => {
             <p class="film-card__description">${formatDescription(description, MAX_DESCRIPTION_LENGTH)}</p>
             <span class="film-card__comments">${comments.length} comments</span>
           </a>
-          <div class="film-card__controls">
-            <button class="film-card__controls-item film-card__controls-item--add-to-watchlist" type="button">Add to watchlist</button>
-            <button class="film-card__controls-item film-card__controls-item--mark-as-watched" type="button">Mark as watched</button>
-            <button class="film-card__controls-item film-card__controls-item--favorite" type="button">Mark as favorite</button>
-          </div>
+          ${createControlsTemplate(movie.userDetails)}
         </article>`;
 };
 
@@ -45,8 +64,38 @@ export default class CardView extends AbstractView {
     this.element.querySelector('.film-card__link').addEventListener('click', this.#clickHandler);
   };
 
+  setFavoriteClickHandler = (callback) => {
+    this._callback.favoriteClick = callback;
+    this.element.querySelector('.film-card__controls-item--favorite').addEventListener('click', this.#favoriteClickHandler);
+  };
+
+  setWatchedClickHandler = (callback) => {
+    this._callback.watchedClick = callback;
+    this.element.querySelector('.film-card__controls-item--mark-as-watched').addEventListener('click', this.#watchedClickHandler);
+  };
+
+  setWatchlistClickHandler = (callback) => {
+    this._callback.watchlistClick = callback;
+    this.element.querySelector('.film-card__controls-item--add-to-watchlist').addEventListener('click', this.#watchlistClickHandler);
+  };
+
   #clickHandler = (evt) => {
     evt.preventDefault();
     this._callback.click();
+  };
+
+  #favoriteClickHandler = (evt) => {
+    evt.preventDefault();
+    this._callback.favoriteClick();
+  };
+
+  #watchedClickHandler = (evt) => {
+    evt.preventDefault();
+    this._callback.watchedClick();
+  };
+
+  #watchlistClickHandler = (evt) => {
+    evt.preventDefault();
+    this._callback.watchlistClick();
   };
 }

@@ -2,12 +2,11 @@ import {render} from '../framework/render';
 import CardListView from '../view/card-list-view';
 import NavigationView from '../view/navigation-view';
 import FilterView from '../view/filter-view';
-import CardView from '../view/card-view';
 import CardListSectionView from '../view/card-list-section-view';
-import PopupView from '../view/popup-view';
 import ShowMoreButtonView from '../view/show-more-button-view';
 import MoviesTitleView from '../view/movies-title-view';
-import {isEscapeKey} from '../util';
+import MoviePresenter from './movie-presenter';
+import {updateItem} from '../util';
 
 const LINE_CARDS_COUNT = 5;
 
@@ -17,11 +16,14 @@ export default class CardListPresenter {
   #comments = [];
   #renderedCardCount = LINE_CARDS_COUNT;
   #isEmptyList = true;
+  #moviePresenter = new Map();
 
   #cardListContainer = null;
   #cardListComponent = new CardListView();
   #cardListSectionComponent = new CardListSectionView();
   #loadMoreButtonComponent = new ShowMoreButtonView();
+  #navigationComponent = new NavigationView();
+  #filterComponent = new FilterView();
 
   constructor(cardListContainer, moviesData) {
     this.#moviesData = moviesData;
@@ -49,48 +51,49 @@ export default class CardListPresenter {
     }
   };
 
-  #renderMovie = (movie) => {
-    const POPUP_OPEN_CLASSNAME = 'hide-overflow';
-    const movieComponent = new CardView(movie);
-    const popupComponent = new PopupView(movie, this.#comments);
-
-    const closePopup = () => {
-      document.body.classList.remove(POPUP_OPEN_CLASSNAME);
-      document.body.removeChild(popupComponent.element);
-      popupComponent.removeElement();
-    };
-
-    const onEscKeyDown = (evt) => {
-      if (isEscapeKey(evt)) {
-        evt.preventDefault();
-        closePopup();
-        document.removeEventListener('keydown', onEscKeyDown);
-      }
-    };
-
-    const openPopup = () => {
-      document.body.appendChild(popupComponent.element);
-      document.body.classList.add(POPUP_OPEN_CLASSNAME);
-
-      document.addEventListener('keydown', onEscKeyDown);
-      popupComponent.setCloseButtonClickHandler(closePopup);
-    };
-
-    movieComponent.setClickHandler(openPopup);
-
-    render(movieComponent, this.#cardListComponent.element);
+  #handleMovieChange = (updatedMovie) => {
+    this.#movies = updateItem(this.#movies, updatedMovie);
+    this.#moviePresenter.get(updatedMovie.id).init(updatedMovie, this.#comments);
   };
 
-  #renderCardList = () => {
-    render(new NavigationView(), this.#cardListContainer);
+  #handlePopupOpen = () => {
+    this.#moviePresenter.forEach((presenter) => presenter.resetView());
+  };
 
-    if (!this.#isEmptyList) {
-      render(new FilterView(), this.#cardListContainer);
-    }
+  #renderNavigation = () => {
+    render(this.#navigationComponent, this.#cardListContainer);
+  };
 
+  #renderFilter = () => {
+    render(this.#filterComponent, this.#cardListContainer);
+  };
+
+  #renderMovie = (movie) => {
+    const moviePresenter = new MoviePresenter(this.#cardListComponent.element, this.#handleMovieChange, this.#handlePopupOpen);
+    moviePresenter.init(movie, this.#comments);
+    this.#moviePresenter.set(movie.id, moviePresenter);
+  };
+
+  #renderLoadMoreButton = () => {
+    render(this.#loadMoreButtonComponent, this.#cardListSectionComponent.element);
+
+    this.#loadMoreButtonComponent.setClickHandler(this.#handleLoadMoreButtonClick);
+  };
+
+  #renderCardListWrapper = () => {
     render(this.#cardListSectionComponent, this.#cardListContainer);
     render(new MoviesTitleView(this.#isEmptyList), this.#cardListSectionComponent.element);
     render(this.#cardListComponent, this.#cardListSectionComponent.element);
+  };
+
+  #renderCardList = () => {
+    this.#renderNavigation();
+
+    if (!this.#isEmptyList) {
+      this.#renderFilter();
+    }
+
+    this.#renderCardListWrapper();
 
     const cardListLength = Math.min(this.#movies.length, LINE_CARDS_COUNT);
     for (let i = 0; i < cardListLength; i++) {
@@ -98,9 +101,7 @@ export default class CardListPresenter {
     }
 
     if (this.#movies.length > LINE_CARDS_COUNT) {
-      render(this.#loadMoreButtonComponent, this.#cardListSectionComponent.element);
-
-      this.#loadMoreButtonComponent.setClickHandler(this.#handleLoadMoreButtonClick);
+      this.#renderLoadMoreButton();
     }
   };
 }
