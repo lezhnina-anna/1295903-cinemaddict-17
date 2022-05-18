@@ -63,6 +63,40 @@ const updateItem = (items, update, indexToUpdate = 0) => {
   ];
 };
 
+const getWeightForNull = (valueA, valueB) => {
+  if (valueA === null && valueB === null) {
+    return 0;
+  }
+
+  if (valueA === null) {
+    return 1;
+  }
+
+  if (valueB === null) {
+    return -1;
+  }
+
+  return null;
+};
+
+const sortByDate = (movieA, movieB) => {
+  const dateA = movieA.filmInfo.release.date;
+  const dateB = movieB.filmInfo.release.date;
+
+  const weight = getWeightForNull(dateA, dateB);
+
+  return weight ?? dayjs(dateB).diff(dayjs(dateA));
+};
+
+const sortByRating = (movieA, movieB) => {
+  const ratingA = movieA.filmInfo.totalRating;
+  const ratingB = movieB.filmInfo.totalRating;
+
+  const weight = getWeightForNull(ratingA, ratingB);
+
+  return weight ?? ratingB - ratingA;
+};
+
 export {
   getRandomInteger,
   humanizeMovieDate,
@@ -72,5 +106,7 @@ export {
   generateDate,
   humanizeCommentDate,
   isEscapeKey,
-  updateItem
+  updateItem,
+  sortByDate,
+  sortByRating
 };

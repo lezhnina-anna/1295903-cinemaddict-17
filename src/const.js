@@ -83,4 +83,10 @@ const EMOTIONS = [
   'angry',
 ];
 
-export {POSTERS, GENRES, DESCRIPTION, TITLES, NAMES, COUNTRIES, COMMENTS, EMOTIONS};
+const SortType = {
+  DEFAULT: 'default',
+  DATE: 'date',
+  RATING: 'rating',
+};
+
+export {POSTERS, GENRES, DESCRIPTION, TITLES, NAMES, COUNTRIES, COMMENTS, EMOTIONS, SortType};
