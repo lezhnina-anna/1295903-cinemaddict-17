@@ -1,5 +1,6 @@
 import {generateDate, getRandomInteger, getUniqueValues} from '../util';
 import {COUNTRIES, DESCRIPTION, GENRES, NAMES, POSTERS, TITLES} from '../const';
+import {nanoid} from 'nanoid';
 
 const generateUniqueArray = (array) => {
   const length = getRandomInteger(1, array.length - 1);
@@ -24,7 +25,7 @@ export const generateMovie = () => {
   const isAlreadyWatched = getRandomInteger(0, 1);
   const watchingDate = isAlreadyWatched ? generateDate(-2000) : '';
   return {
-    id: 0,
+    id: nanoid(),
     comments: [],
     filmInfo: {
       title: TITLES[getRandomInteger(0, TITLES.length - 1)],

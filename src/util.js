@@ -38,6 +38,31 @@ const generateDate = (minDaysGap, maxDaysGap) => {
 
 const isEscapeKey = (evt) => evt.key === 'Escape' || evt.key === 'Esc';
 
+const getAllIndexes = (arr, val) => {
+  const indexes = [];
+
+  for (let i = 0; i < arr.length; i++) {
+    if (arr[i] === val) {
+      indexes.push(i);
+    }
+  }
+  return indexes;
+};
+
+const updateItem = (items, update, indexToUpdate = 0) => {
+  const indexes = getAllIndexes(items, update);
+
+  if (!indexes.length || ((indexes.length - 1) < indexToUpdate)) {
+    return items;
+  }
+
+  return [
+    ...items.slice(0, indexes[indexToUpdate]),
+    update,
+    ...items.slice(indexes[indexToUpdate] + 1)
+  ];
+};
+
 export {
   getRandomInteger,
   humanizeMovieDate,
@@ -46,5 +71,6 @@ export {
   formatDescription,
   generateDate,
   humanizeCommentDate,
-  isEscapeKey
+  isEscapeKey,
+  updateItem
 };
