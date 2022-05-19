@@ -136,7 +136,7 @@ export default class CardListPresenter {
     if (this.#movies.length > LINE_CARDS_COUNT) {
       this.#renderLoadMoreButton();
     }
-  }
+  };
 
   #renderCardList = () => {
     this.#renderNavigation();
