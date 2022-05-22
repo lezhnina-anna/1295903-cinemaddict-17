@@ -1,12 +1,13 @@
-import {render} from '../framework/render';
+import {remove, render} from '../framework/render';
 import CardListView from '../view/card-list-view';
 import NavigationView from '../view/navigation-view';
-import FilterView from '../view/filter-view';
+import SortView from '../view/sort-view';
 import CardListSectionView from '../view/card-list-section-view';
 import ShowMoreButtonView from '../view/show-more-button-view';
 import MoviesTitleView from '../view/movies-title-view';
 import MoviePresenter from './movie-presenter';
-import {updateItem} from '../util';
+import {sortByDate, sortByRating, updateItem} from '../util';
+import {SortType} from '../const';
 
 const LINE_CARDS_COUNT = 5;
 
@@ -23,7 +24,7 @@ export default class CardListPresenter {
   #cardListSectionComponent = new CardListSectionView();
   #loadMoreButtonComponent = new ShowMoreButtonView();
   #navigationComponent = new NavigationView();
-  #filterComponent = new FilterView();
+  #sortComponent = new SortView(SortType.DEFAULT);
 
   constructor(cardListContainer, moviesData) {
     this.#moviesData = moviesData;
@@ -53,6 +54,7 @@ export default class CardListPresenter {
 
   #handleMovieChange = (updatedMovie) => {
     this.#movies = updateItem(this.#movies, updatedMovie);
+    this.#moviesData.movies = updateItem(this.#moviesData.movies, updatedMovie);
     this.#moviePresenter.get(updatedMovie.id).init(updatedMovie, this.#comments);
   };
 
@@ -60,12 +62,46 @@ export default class CardListPresenter {
     this.#moviePresenter.forEach((presenter) => presenter.resetView());
   };
 
+  #sortTasks = (sortType) => {
+    switch (sortType) {
+      case SortType.DATE:
+        this.#movies.sort(sortByDate);
+        break;
+      case SortType.RATING:
+        this.#movies.sort(sortByRating);
+        break;
+      default:
+        this.#movies = [...this.#moviesData.movies];
+    }
+
+    this.#sortComponent.sortType = sortType;
+  };
+
+  #handleSortTypeChange = (sortType) => {
+    if (this.#sortComponent.sortType === sortType) {
+      return;
+    }
+
+    this.#sortTasks(sortType);
+    this.#clearCardListContent();
+    this.#renderCardListContent();
+  };
+
+  #clearCardListContent = () => {
+    this.#moviePresenter.forEach((presenter) => presenter.destroy());
+    this.#moviePresenter.clear();
+    this.#renderedCardCount = LINE_CARDS_COUNT;
+    remove(this.#loadMoreButtonComponent);
+    remove(this.#sortComponent);
+  };
+
   #renderNavigation = () => {
     render(this.#navigationComponent, this.#cardListContainer);
   };
 
-  #renderFilter = () => {
-    render(this.#filterComponent, this.#cardListContainer);
+  #renderSort = () => {
+    render(this.#sortComponent, this.#cardListContainer);
+    this.#sortComponent.setSortTypeChangeHandler(this.#handleSortTypeChange);
   };
 
   #renderMovie = (movie) => {
@@ -86,15 +122,12 @@ export default class CardListPresenter {
     render(this.#cardListComponent, this.#cardListSectionComponent.element);
   };
 
-  #renderCardList = () => {
-    this.#renderNavigation();
-
+  #renderCardListContent = () => {
     if (!this.#isEmptyList) {
-      this.#renderFilter();
+      this.#renderSort();
     }
 
     this.#renderCardListWrapper();
-
     const cardListLength = Math.min(this.#movies.length, LINE_CARDS_COUNT);
     for (let i = 0; i < cardListLength; i++) {
       this.#renderMovie(this.#movies[i]);
@@ -103,5 +136,10 @@ export default class CardListPresenter {
     if (this.#movies.length > LINE_CARDS_COUNT) {
       this.#renderLoadMoreButton();
     }
+  };
+
+  #renderCardList = () => {
+    this.#renderNavigation();
+    this.#renderCardListContent();
   };
 }

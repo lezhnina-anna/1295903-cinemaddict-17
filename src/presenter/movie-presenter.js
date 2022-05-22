@@ -59,6 +59,11 @@ export default class MoviePresenter {
     }
   };
 
+  destroy = () => {
+    remove(this.#movieComponent);
+    remove(this.#popupComponent);
+  };
+
   #closePopup = () => {
     document.body.classList.remove(POPUP_OPEN_CLASSNAME);
     document.body.removeChild(this.#popupComponent.element);
