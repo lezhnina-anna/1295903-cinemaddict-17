@@ -65,16 +65,16 @@ export default class MoviePresenter {
   };
 
   #closePopup = () => {
+    this.#popupComponent.reset();
     document.body.classList.remove(POPUP_OPEN_CLASSNAME);
     document.body.removeChild(this.#popupComponent.element);
-    this.#popupComponent.removeElement();
+    document.removeEventListener('keydown', this.#onEscKeyDown);
   };
 
   #onEscKeyDown = (evt) => {
     if (isEscapeKey(evt)) {
       evt.preventDefault();
       this.#closePopup();
-      document.removeEventListener('keydown', this.#onEscKeyDown);
     }
   };
 
