@@ -2,6 +2,7 @@ import CardView from '../view/card-view';
 import PopupView from '../view/popup-view';
 import {isEscapeKey} from '../util';
 import {remove, render, replace} from '../framework/render';
+import {UpdateType} from '../const';
 
 const POPUP_OPEN_CLASSNAME = 'hide-overflow';
 
@@ -95,14 +96,14 @@ export default class MoviePresenter {
   };
 
   #handleFavoriteClick = () => {
-    this.#changeData({...this.#movie, userDetails: {...this.#movie.userDetails, favorite: !this.#movie.userDetails.favorite}});
+    this.#changeData(UpdateType.PATCH, {...this.#movie, userDetails: {...this.#movie.userDetails, favorite: !this.#movie.userDetails.favorite}});
   };
 
   #handleWatchedClick = () => {
-    this.#changeData({...this.#movie, userDetails: {...this.#movie.userDetails, alreadyWatched: !this.#movie.userDetails.alreadyWatched}});
+    this.#changeData(UpdateType.PATCH, {...this.#movie, userDetails: {...this.#movie.userDetails, alreadyWatched: !this.#movie.userDetails.alreadyWatched}});
   };
 
   #handleWatchlistClick = () => {
-    this.#changeData({...this.#movie, userDetails: {...this.#movie.userDetails, watchlist: !this.#movie.userDetails.watchlist}});
+    this.#changeData(UpdateType.PATCH, {...this.#movie, userDetails: {...this.#movie.userDetails, watchlist: !this.#movie.userDetails.watchlist}});
   };
 }

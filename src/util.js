@@ -1,4 +1,5 @@
 import dayjs from 'dayjs';
+import {FilterType} from './const';
 
 const getRandomInteger = (a = 0, b = 1) => {
   const lower = Math.ceil(Math.min(a, b));
@@ -38,31 +39,6 @@ const generateDate = (minDaysGap, maxDaysGap) => {
 
 const isEscapeKey = (evt) => evt.key === 'Escape' || evt.key === 'Esc';
 
-const getAllIndexes = (arr, val) => {
-  const indexes = [];
-
-  for (let i = 0; i < arr.length; i++) {
-    if (arr[i] === val) {
-      indexes.push(i);
-    }
-  }
-  return indexes;
-};
-
-const updateItem = (items, update, indexToUpdate = 0) => {
-  const indexes = getAllIndexes(items, update);
-
-  if (!indexes.length || ((indexes.length - 1) < indexToUpdate)) {
-    return items;
-  }
-
-  return [
-    ...items.slice(0, indexes[indexToUpdate]),
-    update,
-    ...items.slice(indexes[indexToUpdate] + 1)
-  ];
-};
-
 const getWeightForNull = (valueA, valueB) => {
   if (valueA === null && valueB === null) {
     return 0;
@@ -97,6 +73,13 @@ const sortByRating = (movieA, movieB) => {
   return weight ?? ratingB - ratingA;
 };
 
+const filter = {
+  [FilterType.ALL]: (movies) => movies,
+  [FilterType.WATCHLIST]: (movies) => movies.filter((movie) => movie.userDetails.watchlist),
+  [FilterType.HISTORY]: (movies) => movies.filter((movie) => movie.userDetails.alreadyWatched),
+  [FilterType.FAVORITES]: (movies) => movies.filter((movie) => movie.userDetails.favorite)
+};
+
 export {
   getRandomInteger,
   humanizeMovieDate,
@@ -106,7 +89,7 @@ export {
   generateDate,
   humanizeCommentDate,
   isEscapeKey,
-  updateItem,
   sortByDate,
-  sortByRating
+  sortByRating,
+  filter
 };

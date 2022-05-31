@@ -89,4 +89,17 @@ const SortType = {
   RATING: 'rating',
 };
 
-export {POSTERS, GENRES, DESCRIPTION, TITLES, NAMES, COUNTRIES, COMMENTS, EMOTIONS, SortType};
+const UpdateType = {
+  PATCH: 'PATCH',
+  MINOR: 'MINOR',
+  MAJOR: 'MAJOR',
+};
+
+const FilterType = {
+  ALL: 'ALL',
+  WATCHLIST: 'WATCHLIST',
+  HISTORY: 'HISTORY',
+  FAVORITES: 'FAVORITES',
+};
+
+export {POSTERS, GENRES, DESCRIPTION, TITLES, NAMES, COUNTRIES, COMMENTS, EMOTIONS, SortType, UpdateType, FilterType};
