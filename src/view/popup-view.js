@@ -44,7 +44,7 @@ const createCommentsTemplate = (comments) => comments.map((comment) =>
       <p class="film-details__comment-info">
         <span class="film-details__comment-author">${comment.author}</span>
         <span class="film-details__comment-day">${humanizeCommentDate(comment.date)}</span>
-        <button class="film-details__comment-delete">Delete</button>
+        <button class="film-details__comment-delete" data-id="${comment.id}">Delete</button>
       </p>
     </div>
   </li>
@@ -143,7 +143,7 @@ const createPopupTemplate = (movie, commentsList, emoji) => {
 
         <div class="film-details__new-comment">
           <div class="film-details__add-emoji-label">
-          ${ emoji ? createEmojiTemplate(emoji) : ''}
+          ${emoji ? createEmojiTemplate(emoji) : ''}
         </div>
 
           <label class="film-details__comment-label">
@@ -234,6 +234,14 @@ export default class PopupView extends AbstractStatefulView {
     this.element.querySelector('.film-details__control-button--watchlist').addEventListener('click', this.#watchlistClickHandler);
   };
 
+  setDeleteCommentClickHandler = (callback) => {
+    this._callback.deleteCommentClick = callback;
+    const comments = this.element.querySelectorAll('.film-details__comment-delete');
+    for (const comment of comments) {
+      comment.addEventListener('click', this.#deleteCommentClickHandler);
+    }
+  };
+
   #closeButtonClickHandler = (evt) => {
     evt.preventDefault();
     this._callback.closeButtonClick();
@@ -266,6 +274,11 @@ export default class PopupView extends AbstractStatefulView {
 
   #scrollHandler = (evt) => {
     this._setState({...this._state, scrollTop: evt.target.scrollTop});
+  };
+
+  #deleteCommentClickHandler = (evt) => {
+    evt.preventDefault();
+    this._callback.deleteCommentClick(evt.target.dataset.id);
   };
 
   #setScroll = () => {

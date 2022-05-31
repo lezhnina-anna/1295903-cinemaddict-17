@@ -93,17 +93,34 @@ export default class MoviePresenter {
     this.#popupComponent.setFavoriteClickHandler(this.#handleFavoriteClick);
     this.#popupComponent.setWatchedClickHandler(this.#handleWatchedClick);
     this.#popupComponent.setWatchlistClickHandler(this.#handleWatchlistClick);
+    this.#popupComponent.setDeleteCommentClickHandler(this.#handleDeleteCommentClick);
   };
 
   #handleFavoriteClick = () => {
-    this.#changeData(UpdateType.PATCH, {...this.#movie, userDetails: {...this.#movie.userDetails, favorite: !this.#movie.userDetails.favorite}});
+    this.#changeData(UpdateType.MINOR, {
+      ...this.#movie,
+      userDetails: {...this.#movie.userDetails, favorite: !this.#movie.userDetails.favorite}
+    });
   };
 
   #handleWatchedClick = () => {
-    this.#changeData(UpdateType.PATCH, {...this.#movie, userDetails: {...this.#movie.userDetails, alreadyWatched: !this.#movie.userDetails.alreadyWatched}});
+    this.#changeData(UpdateType.MINOR, {
+      ...this.#movie,
+      userDetails: {...this.#movie.userDetails, alreadyWatched: !this.#movie.userDetails.alreadyWatched}
+    });
   };
 
   #handleWatchlistClick = () => {
-    this.#changeData(UpdateType.PATCH, {...this.#movie, userDetails: {...this.#movie.userDetails, watchlist: !this.#movie.userDetails.watchlist}});
+    this.#changeData(UpdateType.MINOR, {
+      ...this.#movie,
+      userDetails: {...this.#movie.userDetails, watchlist: !this.#movie.userDetails.watchlist}
+    });
+  };
+
+  #handleDeleteCommentClick = (id) => {
+    this.#changeData(UpdateType.PATCH, {
+      ...this.#movie,
+      comments: [...this.#movie.comments].filter((value) => value.toString() !== id)
+    });
   };
 }

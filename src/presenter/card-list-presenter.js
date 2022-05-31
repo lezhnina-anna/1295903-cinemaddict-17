@@ -6,7 +6,7 @@ import ShowMoreButtonView from '../view/show-more-button-view';
 import MoviesTitleView from '../view/movies-title-view';
 import MoviePresenter from './movie-presenter';
 import {filter, sortByDate, sortByRating} from '../util';
-import {SortType, UpdateType} from '../const';
+import {FilterType, SortType, UpdateType} from '../const';
 
 const LINE_CARDS_COUNT = 5;
 
@@ -17,12 +17,14 @@ export default class CardListPresenter {
   #renderedCardCount = LINE_CARDS_COUNT;
   #moviePresenter = new Map();
   #sortType = SortType.DEFAULT;
+  #filterType = FilterType.ALL;
 
   #cardListContainer = null;
   #cardListComponent = new CardListView();
   #cardListSectionComponent = new CardListSectionView();
   #sortComponent = null;
   #loadMoreButtonComponent = null;
+  #movieTitleComponent = null;
 
   constructor(cardListContainer, moviesData, filterModel) {
     this.#moviesModel = moviesData.moviesModel;
@@ -35,9 +37,9 @@ export default class CardListPresenter {
   }
 
   get movies() {
-    const filterType = this.#filterModel.filter;
+    this.#filterType = this.#filterModel.filter;
     const movies = this.#moviesModel.movies;
-    const filteredMovies = filter[filterType](movies);
+    const filteredMovies = filter[this.#filterType](movies);
 
     switch (this.#sortType) {
       case SortType.DATE:
@@ -112,12 +114,16 @@ export default class CardListPresenter {
 
     if (resetRenderedCardCount) {
       this.#renderedCardCount = LINE_CARDS_COUNT;
-    } else  {
+    } else {
       this.#renderedCardCount = Math.min(moviesCount, this.#renderedCardCount);
     }
 
     remove(this.#loadMoreButtonComponent);
     remove(this.#sortComponent);
+
+    if (this.#movieTitleComponent) {
+      remove(this.#movieTitleComponent);
+    }
 
     if (resetSortType) {
       this.#sortType = SortType.DEFAULT;
@@ -144,9 +150,15 @@ export default class CardListPresenter {
     render(this.#loadMoreButtonComponent, this.#cardListSectionComponent.element);
   };
 
+  #renderMoviesTitle = () => {
+    const isEmptyList = this.movies.length === 0;
+    this.#movieTitleComponent = new MoviesTitleView(isEmptyList, this.#filterType);
+    render(this.#movieTitleComponent, this.#cardListSectionComponent.element);
+  };
+
   #renderCardListWrapper = () => {
     render(this.#cardListSectionComponent, this.#cardListContainer);
-    render(new MoviesTitleView(), this.#cardListSectionComponent.element);
+    this.#renderMoviesTitle();
     render(this.#cardListComponent, this.#cardListSectionComponent.element);
   };
 
