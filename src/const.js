@@ -95,6 +95,12 @@ const UpdateType = {
   MAJOR: 'MAJOR',
 };
 
+const ActionType = {
+  UPDATE_MOVIE: 'UPDATE_MOVIE',
+  ADD_COMMENT: 'ADD_COMMENT',
+  DELETE_COMMENT: 'DELETE_COMMENT',
+};
+
 const FilterType = {
   ALL: 'ALL',
   WATCHLIST: 'WATCHLIST',
@@ -102,4 +108,17 @@ const FilterType = {
   FAVORITES: 'FAVORITES',
 };
 
-export {POSTERS, GENRES, DESCRIPTION, TITLES, NAMES, COUNTRIES, COMMENTS, EMOTIONS, SortType, UpdateType, FilterType};
+export {
+  POSTERS,
+  GENRES,
+  DESCRIPTION,
+  TITLES,
+  NAMES,
+  COUNTRIES,
+  COMMENTS,
+  EMOTIONS,
+  SortType,
+  UpdateType,
+  FilterType,
+  ActionType
+};

@@ -6,7 +6,7 @@ import ShowMoreButtonView from '../view/show-more-button-view';
 import MoviesTitleView from '../view/movies-title-view';
 import MoviePresenter from './movie-presenter';
 import {filter, sortByDate, sortByRating} from '../util';
-import {FilterType, SortType, UpdateType} from '../const';
+import {ActionType, FilterType, SortType, UpdateType} from '../const';
 
 const LINE_CARDS_COUNT = 5;
 
@@ -72,8 +72,20 @@ export default class CardListPresenter {
     }
   };
 
-  #handleViewAction = (updateType, update) => {
-    this.#moviesModel.updateMovie(updateType, update);
+  #handleViewAction = (actionType, update) => {
+    switch (actionType) {
+      case ActionType.UPDATE_MOVIE:
+        this.#moviesModel.updateMovie(UpdateType.PATCH, update);
+        break;
+      case ActionType.DELETE_COMMENT:
+        this.#commentsModel.deleteComment(UpdateType.PATCH, update.commentId);
+        this.#moviesModel.updateMovie(UpdateType.PATCH, update.movie);
+        break;
+      case ActionType.ADD_COMMENT:
+        this.#commentsModel.addComment(UpdateType.PATCH, update.comment);
+        this.#moviesModel.updateMovie(UpdateType.PATCH, update.movie);
+        break;
+    }
   };
 
   #handleModelEvent = (updateType, data) => {

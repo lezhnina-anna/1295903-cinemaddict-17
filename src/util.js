@@ -39,6 +39,8 @@ const generateDate = (minDaysGap, maxDaysGap) => {
 
 const isEscapeKey = (evt) => evt.key === 'Escape' || evt.key === 'Esc';
 
+const isEnterKey = (evt) => evt.key === 'Enter';
+
 const getWeightForNull = (valueA, valueB) => {
   if (valueA === null && valueB === null) {
     return 0;
@@ -91,5 +93,6 @@ export {
   isEscapeKey,
   sortByDate,
   sortByRating,
-  filter
+  filter,
+  isEnterKey
 };
