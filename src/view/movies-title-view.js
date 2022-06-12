@@ -1,20 +1,21 @@
 import AbstractView from '../framework/view/abstract-view';
+import {FilterType} from '../const';
 
 const createMoviesTitleTemplate = (isEmpty, filter) => {
   if (!isEmpty) {
     return '<h2 class="films-list__title visually-hidden">All movies. Upcoming</h2>';
   }
 
-  let moviesTitleText = '';
+  let moviesTitleText;
 
   switch (filter) {
-    case 'watchlist':
+    case FilterType.WATCHLIST:
       moviesTitleText = 'There are no movies to watch now';
       break;
-    case 'history':
+    case FilterType.HISTORY:
       moviesTitleText = 'There are no watched movies now';
       break;
-    case 'favorites':
+    case FilterType.FAVORITES:
       moviesTitleText = 'There are no favorite movies now';
       break;
     default:

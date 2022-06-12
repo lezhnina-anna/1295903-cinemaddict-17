@@ -89,4 +89,36 @@ const SortType = {
   RATING: 'rating',
 };
 
-export {POSTERS, GENRES, DESCRIPTION, TITLES, NAMES, COUNTRIES, COMMENTS, EMOTIONS, SortType};
+const UpdateType = {
+  PATCH: 'PATCH',
+  MINOR: 'MINOR',
+  MAJOR: 'MAJOR',
+};
+
+const ActionType = {
+  UPDATE_MOVIE: 'UPDATE_MOVIE',
+  ADD_COMMENT: 'ADD_COMMENT',
+  DELETE_COMMENT: 'DELETE_COMMENT',
+};
+
+const FilterType = {
+  ALL: 'ALL',
+  WATCHLIST: 'WATCHLIST',
+  HISTORY: 'HISTORY',
+  FAVORITES: 'FAVORITES',
+};
+
+export {
+  POSTERS,
+  GENRES,
+  DESCRIPTION,
+  TITLES,
+  NAMES,
+  COUNTRIES,
+  COMMENTS,
+  EMOTIONS,
+  SortType,
+  UpdateType,
+  FilterType,
+  ActionType
+};

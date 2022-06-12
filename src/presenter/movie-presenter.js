@@ -2,6 +2,8 @@ import CardView from '../view/card-view';
 import PopupView from '../view/popup-view';
 import {isEscapeKey} from '../util';
 import {remove, render, replace} from '../framework/render';
+import {ActionType} from '../const';
+import {nanoid} from 'nanoid';
 
 const POPUP_OPEN_CLASSNAME = 'hide-overflow';
 
@@ -92,17 +94,49 @@ export default class MoviePresenter {
     this.#popupComponent.setFavoriteClickHandler(this.#handleFavoriteClick);
     this.#popupComponent.setWatchedClickHandler(this.#handleWatchedClick);
     this.#popupComponent.setWatchlistClickHandler(this.#handleWatchlistClick);
+    this.#popupComponent.setDeleteCommentClickHandler(this.#handleDeleteCommentClick);
+    this.#popupComponent.setAddCommentHandler(this.#handleAddComment);
   };
 
   #handleFavoriteClick = () => {
-    this.#changeData({...this.#movie, userDetails: {...this.#movie.userDetails, favorite: !this.#movie.userDetails.favorite}});
+    this.#changeData(ActionType.UPDATE_MOVIE, {
+      ...this.#movie,
+      userDetails: {...this.#movie.userDetails, favorite: !this.#movie.userDetails.favorite}
+    });
   };
 
   #handleWatchedClick = () => {
-    this.#changeData({...this.#movie, userDetails: {...this.#movie.userDetails, alreadyWatched: !this.#movie.userDetails.alreadyWatched}});
+    this.#changeData(ActionType.UPDATE_MOVIE, {
+      ...this.#movie,
+      userDetails: {...this.#movie.userDetails, alreadyWatched: !this.#movie.userDetails.alreadyWatched}
+    });
   };
 
   #handleWatchlistClick = () => {
-    this.#changeData({...this.#movie, userDetails: {...this.#movie.userDetails, watchlist: !this.#movie.userDetails.watchlist}});
+    this.#changeData(ActionType.UPDATE_MOVIE, {
+      ...this.#movie,
+      userDetails: {...this.#movie.userDetails, watchlist: !this.#movie.userDetails.watchlist}
+    });
+  };
+
+  #handleDeleteCommentClick = (id) => {
+    this.#changeData(ActionType.DELETE_COMMENT, {
+      movie: {
+        ...this.#movie,
+        comments: [...this.#movie.comments].filter((value) => value.toString() !== id)
+      },
+      commentId: id
+    });
+  };
+
+  #handleAddComment = (comment) => {
+    const commentId = nanoid();
+    this.#changeData(ActionType.ADD_COMMENT, {
+      movie: {
+        ...this.#movie,
+        comments: [...this.#movie.comments, commentId]
+      },
+      comment: {...comment, id: commentId}
+    });
   };
 }
