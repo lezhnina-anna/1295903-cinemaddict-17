@@ -16,26 +16,28 @@ export default class MoviePresenter {
   #popupComponent = null;
 
   #movie = null;
+  #commentsModel = null;
 
-  constructor(cardListContainer, changeData, beforePopupOpen) {
+  constructor(cardListContainer, changeData, beforePopupOpen, commentsModel) {
     this.#cardListContainer = cardListContainer;
     this.#changeData = changeData;
     this.#beforePopupOpen = beforePopupOpen;
+    this.#commentsModel = commentsModel;
   }
 
-  init = (movie, comments) => {
+  init = (movie) => {
     this.#movie = movie;
 
     const prevMovieComponent = this.#movieComponent;
     const prevPopupComponent = this.#popupComponent;
 
     this.#movieComponent = new CardView(movie);
-    this.#popupComponent = new PopupView(movie, comments);
+    this.#popupComponent = new PopupView(movie);
 
     this.#movieComponent.setClickHandler(this.#openPopup);
-    this.#movieComponent.setFavoriteClickHandler(this.#handleFavoriteClick);
     this.#movieComponent.setWatchedClickHandler(this.#handleWatchedClick);
-    this.#movieComponent.setWatchlistClickHandler(this.#handleWatchlistClick);
+    this.#movieComponent.setFavoriteClickHandler(() => this.#handleControlClick('favorite'));
+    this.#movieComponent.setWatchlistClickHandler(() => this.#handleControlClick('watchlist'));
 
     if (prevMovieComponent === null || prevPopupComponent === null) {
       render(this.#movieComponent, this.#cardListContainer);
@@ -82,40 +84,43 @@ export default class MoviePresenter {
 
   #openPopup = () => {
     this.#beforePopupOpen();
-    document.body.appendChild(this.#popupComponent.element);
-    document.body.classList.add(POPUP_OPEN_CLASSNAME);
+    this.#commentsModel.init(this.#movie.id)
+      .finally(() => {
+        this.#popupComponent.setComments(this.#commentsModel.comments);
+        document.body.appendChild(this.#popupComponent.element);
+        document.body.classList.add(POPUP_OPEN_CLASSNAME);
 
-    document.addEventListener('keydown', this.#onEscKeyDown);
-    this.#initPopupHandlers();
+        document.addEventListener('keydown', this.#onEscKeyDown);
+        this.#initPopupHandlers();
+      });
   };
 
   #initPopupHandlers = () => {
     this.#popupComponent.setCloseButtonClickHandler(this.#closePopup);
-    this.#popupComponent.setFavoriteClickHandler(this.#handleFavoriteClick);
     this.#popupComponent.setWatchedClickHandler(this.#handleWatchedClick);
-    this.#popupComponent.setWatchlistClickHandler(this.#handleWatchlistClick);
+    this.#popupComponent.setFavoriteClickHandler(() => this.#handleControlClick('favorite'));
+    this.#popupComponent.setWatchlistClickHandler(() => this.#handleControlClick('watchlist'));
     this.#popupComponent.setDeleteCommentClickHandler(this.#handleDeleteCommentClick);
     this.#popupComponent.setAddCommentHandler(this.#handleAddComment);
   };
 
-  #handleFavoriteClick = () => {
+
+  #handleControlClick = (controlName) => {
     this.#changeData(ActionType.UPDATE_MOVIE, {
       ...this.#movie,
-      userDetails: {...this.#movie.userDetails, favorite: !this.#movie.userDetails.favorite}
+      userDetails: {
+        ...this.#movie.userDetails,
+        [controlName]: !this.#movie.userDetails[controlName],
+      }
     });
   };
 
   #handleWatchedClick = () => {
+    const alreadyWatched = !this.#movie.userDetails.alreadyWatched;
+    const watchingDate = alreadyWatched ? new Date() : null;
     this.#changeData(ActionType.UPDATE_MOVIE, {
       ...this.#movie,
-      userDetails: {...this.#movie.userDetails, alreadyWatched: !this.#movie.userDetails.alreadyWatched}
-    });
-  };
-
-  #handleWatchlistClick = () => {
-    this.#changeData(ActionType.UPDATE_MOVIE, {
-      ...this.#movie,
-      userDetails: {...this.#movie.userDetails, watchlist: !this.#movie.userDetails.watchlist}
+      userDetails: {...this.#movie.userDetails, alreadyWatched, watchingDate}
     });
   };
 
