@@ -1,9 +1,24 @@
-import {generateComment} from '../mock/comment';
-import {getRandomInteger} from '../util';
 import Observable from '../framework/observable';
+import {UpdateType} from '../const';
 
 export default class CommentModel extends Observable {
-  #comments = Array.from({length: getRandomInteger(0, 20)}, (_, i) => generateComment(i));
+  #moviesApiService = null;
+  #comments = [];
+
+  constructor(moviesApiService) {
+    super();
+    this.#moviesApiService = moviesApiService;
+  }
+
+  init = async (movieId) => {
+    try {
+      this.#comments = await this.#moviesApiService.getComments(movieId);
+    } catch (err) {
+      this.#comments = [];
+    }
+
+    this._notify(UpdateType.INIT);
+  };
 
   get comments() {
     return this.#comments;

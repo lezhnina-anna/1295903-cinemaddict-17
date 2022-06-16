@@ -181,9 +181,9 @@ const createPopupTemplate = (movie, commentsList, emoji, comment) => {
 };
 
 export default class PopupView extends AbstractStatefulView {
-  constructor(movie, comments) {
+  constructor(movie) {
     super();
-    this._state = PopupView.parseDataToState({movie, comments});
+    this._state = PopupView.parseDataToState(movie);
     this.#setInnerHandlers();
   }
 
@@ -199,9 +199,9 @@ export default class PopupView extends AbstractStatefulView {
     this.setWatchlistClickHandler(this._callback.watchlistClick);
   };
 
-  static parseDataToState = (data) => ({
-    movie: data.movie,
-    comments: data.comments.filter((comment) => data.movie.comments.some((movieCommentId) => movieCommentId === comment.id)),
+  static parseDataToState = (movie) => ({
+    movie: movie,
+    comments: [],
     emoji: '',
     scrollTop: 0,
     comment: ''
@@ -218,6 +218,10 @@ export default class PopupView extends AbstractStatefulView {
 
     this.element.addEventListener('scroll', this.#scrollHandler);
   }
+
+  setComments = (comments) => {
+    this.updateElement({comments: comments});
+  };
 
   setCloseButtonClickHandler = (callback) => {
     this._callback.closeButtonClick = callback;

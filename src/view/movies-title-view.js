@@ -1,7 +1,11 @@
 import AbstractView from '../framework/view/abstract-view';
 import {FilterType} from '../const';
 
-const createMoviesTitleTemplate = (isEmpty, filter) => {
+const createMoviesTitleTemplate = (isEmpty, filter, isLoading) => {
+  if (isLoading) {
+    return '<h2 class="films-list__title">Loading...</h2>';
+  }
+
   if (!isEmpty) {
     return '<h2 class="films-list__title visually-hidden">All movies. Upcoming</h2>';
   }
@@ -29,14 +33,16 @@ const createMoviesTitleTemplate = (isEmpty, filter) => {
 export default class MoviesTitleView extends AbstractView {
   #isEmpty = false;
   #filter = '';
+  #isLoading = true;
 
-  constructor(isEmpty = false, filter = '') {
+  constructor(isEmpty = false, filter = '', isLoading = true) {
     super();
     this.#isEmpty = isEmpty;
     this.#filter = filter;
+    this.#isLoading = isLoading;
   }
 
   get template() {
-    return createMoviesTitleTemplate(this.#isEmpty, this.#filter);
+    return createMoviesTitleTemplate(this.#isEmpty, this.#filter, this.#isLoading);
   }
 }
