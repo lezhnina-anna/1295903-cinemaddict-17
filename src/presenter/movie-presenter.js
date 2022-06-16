@@ -29,7 +29,9 @@ export default class MoviePresenter {
 
     const prevMovieComponent = this.#movieComponent;
     const prevPopupComponent = this.#popupComponent;
+    const scrollTop = prevPopupComponent ? prevPopupComponent.getScroll() : 0;
 
+    console.log(scrollTop);
     this.#movieComponent = new CardView(movie);
     this.#popupComponent = new PopupView(movie);
 
@@ -52,6 +54,7 @@ export default class MoviePresenter {
         .finally(() => {
           this.#popupComponent.setComments(this.#commentsModel.comments);
           replace(this.#popupComponent, prevPopupComponent);
+          this.#popupComponent.setScroll(scrollTop);
           this.#initPopupHandlers();
         });
     }
@@ -60,9 +63,12 @@ export default class MoviePresenter {
   };
 
   setDeleting = (id) => {
+    const scrollTop = this.#popupComponent.getScroll();
     this.#popupComponent.updateElement({
       deletingId: id,
+      scrollTop
     });
+    this.#popupComponent.setScroll(scrollTop);
   };
 
   resetView = () => {

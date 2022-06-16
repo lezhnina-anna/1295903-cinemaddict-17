@@ -37,21 +37,21 @@ const createControlsTemplate = (userDetails) => {
 
 const createCommentsTemplate = (comments, deletingId) => comments.map((comment) =>
   `<li class="film-details__comment" >
-    <span class="film-details__comment-emoji">
-      <img src="./images/emoji/${comment.emotion}.png" width="55" height="55" alt="emoji-smile">
-    </span>
-    <div>
-      <p class="film-details__comment-text">${he.encode(comment.comment)}</p>
-      <p class="film-details__comment-info">
-        <span class="film-details__comment-author">${comment.author}</span>
-        <span class="film-details__comment-day">${humanizeCommentDate(comment.date)}</span>
-        <button class="film-details__comment-delete" data-id="${comment.id}">
-         ${deletingId === comment.id ? 'Deleting...' : 'Delete'}
-        </button>
-      </p>
-    </div>
-  </li>
-`).join('');
+      <span class="film-details__comment-emoji">
+        <img src="./images/emoji/${comment.emotion}.png" width="55" height="55" alt="emoji-smile">
+      </span>
+      <div>
+        <p class="film-details__comment-text">${he.encode(comment.comment)}</p>
+        <p class="film-details__comment-info">
+          <span class="film-details__comment-author">${comment.author}</span>
+          <span class="film-details__comment-day">${humanizeCommentDate(comment.date)}</span>
+          <button class="film-details__comment-delete" data-id="${comment.id}">
+           ${deletingId === comment.id ? 'Deleting...' : 'Delete'}
+          </button>
+        </p>
+      </div>
+    </li>
+  `).join('');
 
 const createEmojiTemplate = (emoji) =>
   `<img src="images/emoji/${emoji}.png" width="55" height="55" alt="emoji-${emoji}">`;
@@ -185,12 +185,12 @@ const createPopupTemplate = (movie, commentsList, emoji, comment, deletingId) =>
 export default class PopupView extends AbstractStatefulView {
   constructor(movie) {
     super();
-    this._state = PopupView.parseDataToState(movie);
+    this._state = PopupView.parseDataToState(movie, scroll);
     this.#setInnerHandlers();
   }
 
   get template() {
-    return createPopupTemplate(this._state.movie, this._state.comments, this._state.emoji, this._state.comment);
+    return createPopupTemplate(this._state.movie, this._state.comments, this._state.emoji, this._state.comment, this._state.deletingId);
   }
 
   _restoreHandlers = () => {
@@ -201,11 +201,11 @@ export default class PopupView extends AbstractStatefulView {
     this.setWatchlistClickHandler(this._callback.watchlistClick);
   };
 
-  static parseDataToState = (movie) => ({
+  static parseDataToState = (movie, scroll) => ({
     movie: movie,
     comments: [],
     emoji: '',
-    scrollTop: 0,
+    scrollTop: scroll,
     comment: '',
     deletingId: -1,
   });
@@ -217,7 +217,7 @@ export default class PopupView extends AbstractStatefulView {
     }
 
     const commentInputElement = this.element.querySelector('.film-details__comment-input');
-    commentInputElement.addEventListener('keydown', this.#commentChangeHandler);
+    commentInputElement.addEventListener('keyup', this.#commentChangeHandler);
 
     this.element.addEventListener('scroll', this.#scrollHandler);
   }
@@ -285,7 +285,7 @@ export default class PopupView extends AbstractStatefulView {
     });
 
     this.element.querySelector(`#emoji-${this._state.emoji}`).checked = true;
-    this.#setScroll();
+    this.setScroll(this._state.scrollTop);
   };
 
   #commentChangeHandler = (evt) => {
@@ -322,8 +322,12 @@ export default class PopupView extends AbstractStatefulView {
     this._callback.deleteCommentClick(evt.target.dataset.id);
   };
 
-  #setScroll = () => {
-    this.element.scrollTop = this._state.scrollTop;
+  setScroll = (scroll) => {
+    this.element.scrollTop = scroll;
+  };
+
+  getScroll = () => {
+    return this._state.scrollTop;
   };
 
   reset = () => {

@@ -76,11 +76,11 @@ export default class CardListPresenter {
         break;
       case ActionType.DELETE_COMMENT:
         this.#moviePresenter.get(update.movie.id).setDeleting(update.commentId);
-        // this.#commentsModel.deleteComment(update.commentId)
-        //   .then(() => {
-        //     this.#moviesModel.updateMovie(UpdateType.PATCH, update.movie);
-        //     this.#moviePresenter.get(update.movie.id).setDeleting(false);
-        //   });
+        this.#commentsModel.deleteComment(update.commentId)
+          .then(() => {
+            this.#moviesModel.updateMovie(UpdateType.PATCH, update.movie);
+            //this.#moviePresenter.get(update.movie.id).setDeleting(-1);
+          });
         break;
       case ActionType.ADD_COMMENT:
         this.#commentsModel.addComment(update.comment, update.movie.id)
