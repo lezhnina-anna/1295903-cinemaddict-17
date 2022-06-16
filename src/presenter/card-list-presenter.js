@@ -75,12 +75,18 @@ export default class CardListPresenter {
         this.#moviesModel.updateMovie(UpdateType.PATCH, update);
         break;
       case ActionType.DELETE_COMMENT:
-        this.#commentsModel.deleteComment(UpdateType.PATCH, update.commentId);
-        this.#moviesModel.updateMovie(UpdateType.PATCH, update.movie);
+        this.#moviePresenter.get(update.movie.id).setDeleting(update.commentId);
+        // this.#commentsModel.deleteComment(update.commentId)
+        //   .then(() => {
+        //     this.#moviesModel.updateMovie(UpdateType.PATCH, update.movie);
+        //     this.#moviePresenter.get(update.movie.id).setDeleting(false);
+        //   });
         break;
       case ActionType.ADD_COMMENT:
-        this.#commentsModel.addComment(UpdateType.PATCH, update.comment);
-        this.#moviesModel.updateMovie(UpdateType.PATCH, update.movie);
+        this.#commentsModel.addComment(update.comment, update.movie.id)
+          .finally(() => {
+            this.#moviesModel.updateMovie(UpdateType.PATCH, update.movie);
+          });
         break;
     }
   };
@@ -88,7 +94,7 @@ export default class CardListPresenter {
   #handleModelEvent = (updateType, data) => {
     switch (updateType) {
       case UpdateType.PATCH:
-        this.#moviePresenter.get(data.id).init(data, this.comments);
+        this.#moviePresenter.get(data.id).init(data);
         break;
       case UpdateType.MINOR:
         this.#clearCardList();

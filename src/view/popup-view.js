@@ -35,7 +35,7 @@ const createControlsTemplate = (userDetails) => {
 </section>`;
 };
 
-const createCommentsTemplate = (comments) => comments.map((comment) =>
+const createCommentsTemplate = (comments, deletingId) => comments.map((comment) =>
   `<li class="film-details__comment" >
     <span class="film-details__comment-emoji">
       <img src="./images/emoji/${comment.emotion}.png" width="55" height="55" alt="emoji-smile">
@@ -45,7 +45,9 @@ const createCommentsTemplate = (comments) => comments.map((comment) =>
       <p class="film-details__comment-info">
         <span class="film-details__comment-author">${comment.author}</span>
         <span class="film-details__comment-day">${humanizeCommentDate(comment.date)}</span>
-        <button class="film-details__comment-delete" data-id="${comment.id}">Delete</button>
+        <button class="film-details__comment-delete" data-id="${comment.id}">
+         ${deletingId === comment.id ? 'Deleting...' : 'Delete'}
+        </button>
       </p>
     </div>
   </li>
@@ -54,7 +56,7 @@ const createCommentsTemplate = (comments) => comments.map((comment) =>
 const createEmojiTemplate = (emoji) =>
   `<img src="images/emoji/${emoji}.png" width="55" height="55" alt="emoji-${emoji}">`;
 
-const createPopupTemplate = (movie, commentsList, emoji, comment) => {
+const createPopupTemplate = (movie, commentsList, emoji, comment, deletingId) => {
   const {comments, filmInfo, userDetails} = movie;
   const {
     title,
@@ -139,7 +141,7 @@ const createPopupTemplate = (movie, commentsList, emoji, comment) => {
         <h3 class="film-details__comments-title">Comments <span class="film-details__comments-count">${comments.length}</span></h3>
 
         <ul class="film-details__comments-list">
-            ${createCommentsTemplate(commentsList)}
+            ${createCommentsTemplate(commentsList, deletingId)}
         </ul>
 
         <div class="film-details__new-comment">
@@ -204,7 +206,8 @@ export default class PopupView extends AbstractStatefulView {
     comments: [],
     emoji: '',
     scrollTop: 0,
-    comment: ''
+    comment: '',
+    deletingId: -1,
   });
 
   #setInnerHandlers() {

@@ -1,5 +1,4 @@
 import Observable from '../framework/observable';
-import {UpdateType} from '../const';
 
 export default class CommentModel extends Observable {
   #moviesApiService = null;
@@ -16,8 +15,6 @@ export default class CommentModel extends Observable {
     } catch (err) {
       this.#comments = [];
     }
-
-    this._notify(UpdateType.INIT);
   };
 
   get comments() {
@@ -29,27 +26,33 @@ export default class CommentModel extends Observable {
     this._notify(updateType, comments);
   }
 
-  addComment = (updateType, update) => {
-    this.#comments = [
-      ...this.#comments,
-      update,
-    ];
-
-    this._notify(updateType, update);
+  addComment = async (update, movieId) => {
+    try {
+      const response = await this.#moviesApiService.addComment(update, movieId);
+      this.#comments = [
+        ...this.#comments,
+        response,
+      ];
+    } catch(err) {
+      throw new Error('Can\'t add task');
+    }
   };
 
-  deleteComment = (updateType, commentId) => {
+  deleteComment = async (commentId) => {
     const index = this.#comments.findIndex((comment) => comment.id.toString() === commentId);
 
     if (index === -1) {
       throw new Error('Can\'t delete unexisting comment');
     }
 
-    this.#comments = [
-      ...this.#comments.slice(0, index),
-      ...this.#comments.slice(index + 1),
-    ];
-
-    this._notify(updateType);
+    try {
+      await this.#moviesApiService.deleteComment(commentId);
+      this.#comments = [
+        ...this.#comments.slice(0, index),
+        ...this.#comments.slice(index + 1),
+      ];
+    } catch(err) {
+      throw new Error('Can\'t delete task');
+    }
   };
 }

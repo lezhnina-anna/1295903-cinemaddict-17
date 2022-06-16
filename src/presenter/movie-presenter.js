@@ -3,7 +3,6 @@ import PopupView from '../view/popup-view';
 import {isEscapeKey} from '../util';
 import {remove, render, replace} from '../framework/render';
 import {ActionType} from '../const';
-import {nanoid} from 'nanoid';
 
 const POPUP_OPEN_CLASSNAME = 'hide-overflow';
 
@@ -49,12 +48,21 @@ export default class MoviePresenter {
     }
 
     if (document.body.contains(prevPopupComponent.element)) {
-      replace(this.#popupComponent, prevPopupComponent);
-      this.#initPopupHandlers();
+      this.#commentsModel.init(this.#movie.id)
+        .finally(() => {
+          this.#popupComponent.setComments(this.#commentsModel.comments);
+          replace(this.#popupComponent, prevPopupComponent);
+          this.#initPopupHandlers();
+        });
     }
 
     remove(prevMovieComponent);
-    remove(prevPopupComponent);
+  };
+
+  setDeleting = (id) => {
+    this.#popupComponent.updateElement({
+      deletingId: id,
+    });
   };
 
   resetView = () => {
@@ -135,13 +143,12 @@ export default class MoviePresenter {
   };
 
   #handleAddComment = (comment) => {
-    const commentId = nanoid();
     this.#changeData(ActionType.ADD_COMMENT, {
       movie: {
         ...this.#movie,
-        comments: [...this.#movie.comments, commentId]
+        comments: this.#movie.comments
       },
-      comment: {...comment, id: commentId}
+      comment: {...comment}
     });
   };
 }
