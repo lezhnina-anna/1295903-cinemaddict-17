@@ -7,8 +7,13 @@ import MoviesTitleView from '../view/movies-title-view';
 import MoviePresenter from './movie-presenter';
 import {filter, sortByDate, sortByRating} from '../util';
 import {ActionType, FilterType, SortType, UpdateType} from '../const';
+import UiBlocker from '../framework/ui-blocker/ui-blocker';
 
 const LINE_CARDS_COUNT = 5;
+const TimeLimit = {
+  LOWER_LIMIT: 350,
+  UPPER_LIMIT: 1000,
+};
 
 export default class CardListPresenter {
   #moviesModel = null;
@@ -22,6 +27,7 @@ export default class CardListPresenter {
   #cardListContainer = null;
   #cardListComponent = new CardListView();
   #cardListSectionComponent = new CardListSectionView();
+  #uiBlocker = new UiBlocker(TimeLimit.LOWER_LIMIT, TimeLimit.UPPER_LIMIT);
   #sortComponent = null;
   #loadMoreButtonComponent = null;
   #movieTitleComponent = null;
@@ -69,26 +75,45 @@ export default class CardListPresenter {
     }
   };
 
-  #handleViewAction = (actionType, update) => {
+  #handleViewAction = async (actionType, update) => {
+    this.#uiBlocker.block();
     switch (actionType) {
       case ActionType.UPDATE_MOVIE:
-        this.#moviesModel.updateMovie(UpdateType.PATCH, update);
+        this.#moviePresenter.get(update.id).setSaving();
+        await this.#moviesModel.updateMovie(UpdateType.PATCH, update)
+          .catch(() => {
+            this.#moviePresenter.get(update.id).setAborting();
+          });
         break;
       case ActionType.DELETE_COMMENT:
-        this.#commentsModel.deleteComment(UpdateType.PATCH, update.commentId);
-        this.#moviesModel.updateMovie(UpdateType.PATCH, update.movie);
+        this.#moviePresenter.get(update.movie.id).setDeleting(update.commentId);
+        await this.#commentsModel.deleteComment(update.commentId)
+          .then(() => {
+            this.#moviesModel.updateMovie(UpdateType.PATCH, update.movie);
+          })
+          .catch(() => {
+            this.#moviePresenter.get(update.movie.id).setAborting();
+          });
         break;
       case ActionType.ADD_COMMENT:
-        this.#commentsModel.addComment(UpdateType.PATCH, update.comment);
-        this.#moviesModel.updateMovie(UpdateType.PATCH, update.movie);
+        this.#moviePresenter.get(update.movie.id).setSaving();
+        await this.#commentsModel.addComment(update.comment, update.movie.id)
+          .then(() => {
+            this.#moviesModel.updateMovie(UpdateType.PATCH, update.movie);
+          })
+          .catch(() => {
+            this.#moviePresenter.get(update.movie.id).setAborting();
+          });
         break;
     }
+
+    this.#uiBlocker.unblock();
   };
 
   #handleModelEvent = (updateType, data) => {
     switch (updateType) {
       case UpdateType.PATCH:
-        this.#moviePresenter.get(data.id).init(data, this.comments);
+        this.#moviePresenter.get(data.id).init(data);
         break;
       case UpdateType.MINOR:
         this.#clearCardList();

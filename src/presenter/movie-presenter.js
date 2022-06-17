@@ -3,7 +3,6 @@ import PopupView from '../view/popup-view';
 import {isEscapeKey} from '../util';
 import {remove, render, replace} from '../framework/render';
 import {ActionType} from '../const';
-import {nanoid} from 'nanoid';
 
 const POPUP_OPEN_CLASSNAME = 'hide-overflow';
 
@@ -30,6 +29,7 @@ export default class MoviePresenter {
 
     const prevMovieComponent = this.#movieComponent;
     const prevPopupComponent = this.#popupComponent;
+    const scrollTop = prevPopupComponent ? prevPopupComponent.getScroll() : 0;
 
     this.#movieComponent = new CardView(movie);
     this.#popupComponent = new PopupView(movie);
@@ -49,12 +49,59 @@ export default class MoviePresenter {
     }
 
     if (document.body.contains(prevPopupComponent.element)) {
-      replace(this.#popupComponent, prevPopupComponent);
-      this.#initPopupHandlers();
+      this.#commentsModel.init(this.#movie.id)
+        .finally(() => {
+          this.#popupComponent.setComments(this.#commentsModel.comments);
+          replace(this.#popupComponent, prevPopupComponent);
+          this.#popupComponent.setScroll(scrollTop);
+          this.#initPopupHandlers();
+        });
     }
 
     remove(prevMovieComponent);
-    remove(prevPopupComponent);
+  };
+
+  setDeleting = (id) => {
+    const scrollTop = this.#popupComponent.getScroll();
+    this.#popupComponent.updateElement({
+      isDisabled: true,
+      deletingId: id,
+      scrollTop
+    });
+    this.#popupComponent.setScroll(scrollTop);
+  };
+
+  setSaving = () => {
+    const scrollTop = this.#popupComponent.getScroll();
+    this.#popupComponent.updateElement({
+      isDisabled: true,
+      scrollTop
+    });
+    this.#popupComponent.setScroll(scrollTop);
+  };
+
+  setAborting = () => {
+    const resetFormState = () => {
+      const scrollTop = this.#popupComponent.getScroll();
+      this.#popupComponent.updateElement({
+        isDisabled: false,
+        deletingId: -1,
+        scrollTop
+      });
+      this.#popupComponent.setScroll(scrollTop);
+    };
+
+    const resetCardState = () => {
+      this.#movieComponent.updateElement({
+        isDisabled: false,
+      });
+    };
+
+    if (document.body.contains(this.#popupComponent.element)) {
+      this.#popupComponent.shake(resetFormState);
+    } else {
+      this.#movieComponent.shake(resetCardState);
+    }
   };
 
   resetView = () => {
@@ -104,7 +151,6 @@ export default class MoviePresenter {
     this.#popupComponent.setAddCommentHandler(this.#handleAddComment);
   };
 
-
   #handleControlClick = (controlName) => {
     this.#changeData(ActionType.UPDATE_MOVIE, {
       ...this.#movie,
@@ -135,13 +181,12 @@ export default class MoviePresenter {
   };
 
   #handleAddComment = (comment) => {
-    const commentId = nanoid();
     this.#changeData(ActionType.ADD_COMMENT, {
       movie: {
         ...this.#movie,
-        comments: [...this.#movie.comments, commentId]
+        comments: this.#movie.comments
       },
-      comment: {...comment, id: commentId}
+      comment: {...comment}
     });
   };
 }

@@ -3,6 +3,8 @@ import ApiService from '../framework/api-service.js';
 const Method = {
   GET: 'GET',
   PUT: 'PUT',
+  POST: 'POST',
+  DELETE: 'DELETE'
 };
 
 export default class MovieApiService extends ApiService {
@@ -11,10 +13,24 @@ export default class MovieApiService extends ApiService {
       .then(ApiService.parseResponse);
   }
 
-  getComments(movieId) {
-    return this._load({url: `comments/${movieId}`})
-      .then(ApiService.parseResponse);
-  }
+  getComments = async (movieId) => await this._load({url: `comments/${movieId}`})
+    .then(ApiService.parseResponse);
+
+  deleteComment = async (commentId) => await this._load({
+    url: `comments/${commentId}`,
+    method: Method.DELETE,
+  });
+
+  addComment = async (comment, movieId) => {
+    const response = await this._load({
+      url: `comments/${movieId}`,
+      method: Method.POST,
+      body: JSON.stringify(comment),
+      headers: new Headers({'Content-Type': 'application/json'}),
+    });
+
+    return await ApiService.parseResponse(response);
+  };
 
   updateMovie = async (movie) => {
     const response = await this._load({

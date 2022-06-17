@@ -5,7 +5,7 @@ import he from 'he';
 const createGenresTemplate = (genres) => genres.map((genre) =>
   `<span class="film-details__genre">${genre}</span>`).join('');
 
-const createControlsTemplate = (userDetails) => {
+const createControlsTemplate = (userDetails, isDisabled) => {
   const ACTIVE_CONTROL_CLASS = 'film-details__control-button--active';
   const {watchlist, alreadyWatched, favorite} = userDetails;
 
@@ -23,38 +23,40 @@ const createControlsTemplate = (userDetails) => {
 
   return `<section  class="film-details__controls">
   <button type="button"  class="film-details__control-button film-details__control-button--watchlist ${watchlistClassName}" id="watchlist"
-          name="watchlist">Add to watchlist
+          name="watchlist" ${isDisabled ? 'disabled' : ''}>Add to watchlist
   </button>
   <button type="button"
            class="film-details__control-button film-details__control-button--watched ${watchedClassName}"
-          id="watched" name="watched">Already watched
+          id="watched" name="watched" ${isDisabled ? 'disabled' : ''}>Already watched
   </button>
   <button type="button"  class="film-details__control-button film-details__control-button--favorite ${favoriteClassName}" id="favorite"
-          name="favorite">Add to favorites
+          name="favorite" ${isDisabled ? 'disabled' : ''}>Add to favorites
   </button>
 </section>`;
 };
 
-const createCommentsTemplate = (comments) => comments.map((comment) =>
+const createCommentsTemplate = (comments, deletingId, isDisabled) => comments.map((comment) =>
   `<li class="film-details__comment" >
-    <span class="film-details__comment-emoji">
-      <img src="./images/emoji/${comment.emotion}.png" width="55" height="55" alt="emoji-smile">
-    </span>
-    <div>
-      <p class="film-details__comment-text">${he.encode(comment.comment)}</p>
-      <p class="film-details__comment-info">
-        <span class="film-details__comment-author">${comment.author}</span>
-        <span class="film-details__comment-day">${humanizeCommentDate(comment.date)}</span>
-        <button class="film-details__comment-delete" data-id="${comment.id}">Delete</button>
-      </p>
-    </div>
-  </li>
-`).join('');
+      <span class="film-details__comment-emoji">
+        <img src="./images/emoji/${comment.emotion}.png" width="55" height="55" alt="emoji-smile">
+      </span>
+      <div>
+        <p class="film-details__comment-text">${he.encode(comment.comment)}</p>
+        <p class="film-details__comment-info">
+          <span class="film-details__comment-author">${comment.author}</span>
+          <span class="film-details__comment-day">${humanizeCommentDate(comment.date)}</span>
+          <button class="film-details__comment-delete" data-id="${comment.id}" ${deletingId === comment.id || isDisabled ? 'disabled' : ''}>
+           ${deletingId === comment.id ? 'Deleting...' : 'Delete'}
+          </button>
+        </p>
+      </div>
+    </li>
+  `).join('');
 
 const createEmojiTemplate = (emoji) =>
   `<img src="images/emoji/${emoji}.png" width="55" height="55" alt="emoji-${emoji}">`;
 
-const createPopupTemplate = (movie, commentsList, emoji, comment) => {
+const createPopupTemplate = (movie, commentsList, emoji, comment, deletingId, isDisabled) => {
   const {comments, filmInfo, userDetails} = movie;
   const {
     title,
@@ -131,7 +133,7 @@ const createPopupTemplate = (movie, commentsList, emoji, comment) => {
           <p class="film-details__film-description">${description}</p>
         </div>
       </div>
-      ${createControlsTemplate(userDetails)}
+      ${createControlsTemplate(userDetails, isDisabled)}
     </div>
 
     <div class="film-details__bottom-container">
@@ -139,7 +141,7 @@ const createPopupTemplate = (movie, commentsList, emoji, comment) => {
         <h3 class="film-details__comments-title">Comments <span class="film-details__comments-count">${comments.length}</span></h3>
 
         <ul class="film-details__comments-list">
-            ${createCommentsTemplate(commentsList)}
+            ${createCommentsTemplate(commentsList, deletingId, isDisabled)}
         </ul>
 
         <div class="film-details__new-comment">
@@ -148,26 +150,26 @@ const createPopupTemplate = (movie, commentsList, emoji, comment) => {
         </div>
 
           <label class="film-details__comment-label">
-            <textarea class="film-details__comment-input" placeholder="Select reaction below and write comment here" name="comment">${he.encode(comment)}</textarea>
+            <textarea class="film-details__comment-input" placeholder="Select reaction below and write comment here" name="comment" ${isDisabled ? 'disabled' : ''}>${he.encode(comment)}</textarea>
           </label>
 
           <div class="film-details__emoji-list">
-            <input class="film-details__emoji-item visually-hidden" name="comment-emoji" type="radio" id="emoji-smile" value="smile">
+            <input class="film-details__emoji-item visually-hidden" name="comment-emoji" type="radio" id="emoji-smile" value="smile" ${isDisabled ? 'disabled' : ''}>
             <label class="film-details__emoji-label" for="emoji-smile">
               <img src="./images/emoji/smile.png" width="30" height="30" alt="emoji">
             </label>
 
-            <input class="film-details__emoji-item visually-hidden" name="comment-emoji" type="radio" id="emoji-sleeping" value="sleeping">
+            <input class="film-details__emoji-item visually-hidden" name="comment-emoji" type="radio" id="emoji-sleeping" value="sleeping" ${isDisabled ? 'disabled' : ''}>
             <label class="film-details__emoji-label" for="emoji-sleeping">
               <img src="./images/emoji/sleeping.png" width="30" height="30" alt="emoji">
             </label>
 
-            <input class="film-details__emoji-item visually-hidden" name="comment-emoji" type="radio" id="emoji-puke" value="puke">
+            <input class="film-details__emoji-item visually-hidden" name="comment-emoji" type="radio" id="emoji-puke" value="puke" ${isDisabled ? 'disabled' : ''}>
             <label class="film-details__emoji-label" for="emoji-puke">
               <img src="./images/emoji/puke.png" width="30" height="30" alt="emoji">
             </label>
 
-            <input class="film-details__emoji-item visually-hidden" name="comment-emoji" type="radio" id="emoji-angry" value="angry">
+            <input class="film-details__emoji-item visually-hidden" name="comment-emoji" type="radio" id="emoji-angry" value="angry" ${isDisabled ? 'disabled' : ''}>
             <label class="film-details__emoji-label" for="emoji-angry">
               <img src="./images/emoji/angry.png" width="30" height="30" alt="emoji">
             </label>
@@ -183,12 +185,12 @@ const createPopupTemplate = (movie, commentsList, emoji, comment) => {
 export default class PopupView extends AbstractStatefulView {
   constructor(movie) {
     super();
-    this._state = PopupView.parseDataToState(movie);
+    this._state = PopupView.parseDataToState(movie, scroll);
     this.#setInnerHandlers();
   }
 
   get template() {
-    return createPopupTemplate(this._state.movie, this._state.comments, this._state.emoji, this._state.comment);
+    return createPopupTemplate(this._state.movie, this._state.comments, this._state.emoji, this._state.comment, this._state.deletingId, this._state.isDisabled);
   }
 
   _restoreHandlers = () => {
@@ -199,12 +201,14 @@ export default class PopupView extends AbstractStatefulView {
     this.setWatchlistClickHandler(this._callback.watchlistClick);
   };
 
-  static parseDataToState = (movie) => ({
+  static parseDataToState = (movie, scroll) => ({
     movie: movie,
     comments: [],
     emoji: '',
-    scrollTop: 0,
-    comment: ''
+    scrollTop: scroll,
+    comment: '',
+    deletingId: -1,
+    isDisabled: false
   });
 
   #setInnerHandlers() {
@@ -214,7 +218,7 @@ export default class PopupView extends AbstractStatefulView {
     }
 
     const commentInputElement = this.element.querySelector('.film-details__comment-input');
-    commentInputElement.addEventListener('keydown', this.#commentChangeHandler);
+    commentInputElement.addEventListener('keyup', this.#commentChangeHandler);
 
     this.element.addEventListener('scroll', this.#scrollHandler);
   }
@@ -282,7 +286,7 @@ export default class PopupView extends AbstractStatefulView {
     });
 
     this.element.querySelector(`#emoji-${this._state.emoji}`).checked = true;
-    this.#setScroll();
+    this.setScroll(this._state.scrollTop);
   };
 
   #commentChangeHandler = (evt) => {
@@ -308,6 +312,7 @@ export default class PopupView extends AbstractStatefulView {
       author: 'my name'
     });
     this.updateElement({...this._state, comment: '', emoji: ''});
+    this.setScroll(this._state.scrollTop);
   };
 
   #scrollHandler = (evt) => {
@@ -319,9 +324,11 @@ export default class PopupView extends AbstractStatefulView {
     this._callback.deleteCommentClick(evt.target.dataset.id);
   };
 
-  #setScroll = () => {
-    this.element.scrollTop = this._state.scrollTop;
+  setScroll = (scroll) => {
+    this.element.scrollTop = scroll;
   };
+
+  getScroll = () => this._state.scrollTop;
 
   reset = () => {
     this.updateElement({...this._state, emoji: '', scrollTop: 0, comment: ''});
