@@ -31,7 +31,6 @@ export default class MoviePresenter {
     const prevPopupComponent = this.#popupComponent;
     const scrollTop = prevPopupComponent ? prevPopupComponent.getScroll() : 0;
 
-    console.log(scrollTop);
     this.#movieComponent = new CardView(movie);
     this.#popupComponent = new PopupView(movie);
 
@@ -65,10 +64,44 @@ export default class MoviePresenter {
   setDeleting = (id) => {
     const scrollTop = this.#popupComponent.getScroll();
     this.#popupComponent.updateElement({
+      isDisabled: true,
       deletingId: id,
       scrollTop
     });
     this.#popupComponent.setScroll(scrollTop);
+  };
+
+  setSaving = () => {
+    const scrollTop = this.#popupComponent.getScroll();
+    this.#popupComponent.updateElement({
+      isDisabled: true,
+      scrollTop
+    });
+    this.#popupComponent.setScroll(scrollTop);
+  };
+
+  setAborting = () => {
+    const resetFormState = () => {
+      const scrollTop = this.#popupComponent.getScroll();
+      this.#popupComponent.updateElement({
+        isDisabled: false,
+        deletingId: -1,
+        scrollTop
+      });
+      this.#popupComponent.setScroll(scrollTop);
+    };
+
+    const resetCardState = () => {
+      this.#movieComponent.updateElement({
+        isDisabled: false,
+      });
+    };
+
+    if (document.body.contains(this.#popupComponent.element)) {
+      this.#popupComponent.shake(resetFormState);
+    } else {
+      this.#movieComponent.shake(resetCardState);
+    }
   };
 
   resetView = () => {
@@ -117,7 +150,6 @@ export default class MoviePresenter {
     this.#popupComponent.setDeleteCommentClickHandler(this.#handleDeleteCommentClick);
     this.#popupComponent.setAddCommentHandler(this.#handleAddComment);
   };
-
 
   #handleControlClick = (controlName) => {
     this.#changeData(ActionType.UPDATE_MOVIE, {
