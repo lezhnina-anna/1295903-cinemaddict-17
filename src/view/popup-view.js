@@ -1,4 +1,5 @@
-import {humanizeMovieDate, humanizeRuntime, humanizeCommentDate, isEscapeKey, isEnterKey} from '../util';
+import {humanizeMovieDate, humanizeRuntime, humanizeCommentDate} from '../util/movie';
+import {isEscapeKey, isEnterKey, isControlKey} from '../util/common';
 import AbstractStatefulView from '../framework/view/abstract-stateful-view';
 import he from 'he';
 
@@ -219,6 +220,7 @@ export default class PopupView extends AbstractStatefulView {
 
     const commentInputElement = this.element.querySelector('.film-details__comment-input');
     commentInputElement.addEventListener('keyup', this.#commentChangeHandler);
+    commentInputElement.addEventListener('keydown', this.#commentKeydownHandler);
 
     this.element.addEventListener('scroll', this.#scrollHandler);
   }
@@ -289,16 +291,17 @@ export default class PopupView extends AbstractStatefulView {
     this.setScroll(this._state.scrollTop);
   };
 
-  #commentChangeHandler = (evt) => {
+  #commentKeydownHandler = (evt) => {
     if (isEscapeKey(evt)) {
       evt.stopPropagation();
     }
 
-    if (isEnterKey(evt)) {
+    if (isEnterKey(evt) && isControlKey(evt)) {
       this.#addCommentHandler();
-      return;
     }
+  };
 
+  #commentChangeHandler = (evt) => {
     this._setState({
       comment: evt.target.value
     });

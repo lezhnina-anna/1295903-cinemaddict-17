@@ -5,7 +5,8 @@ import CardListSectionView from '../view/card-list-section-view';
 import ShowMoreButtonView from '../view/show-more-button-view';
 import MoviesTitleView from '../view/movies-title-view';
 import MoviePresenter from './movie-presenter';
-import {filter, sortByDate, sortByRating} from '../util';
+import {filter} from '../util/filter';
+import {sortByDate, sortByRating} from '../util/movie';
 import {ActionType, FilterType, SortType, UpdateType} from '../const';
 import UiBlocker from '../framework/ui-blocker/ui-blocker';
 
@@ -80,7 +81,7 @@ export default class CardListPresenter {
     switch (actionType) {
       case ActionType.UPDATE_MOVIE:
         this.#moviePresenter.get(update.id).setSaving();
-        await this.#moviesModel.updateMovie(UpdateType.PATCH, update)
+        await this.#moviesModel.updateMovie(UpdateType.MINOR, update)
           .catch(() => {
             this.#moviePresenter.get(update.id).setAborting();
           });

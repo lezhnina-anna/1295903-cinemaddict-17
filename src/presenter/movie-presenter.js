@@ -1,6 +1,6 @@
 import CardView from '../view/card-view';
 import PopupView from '../view/popup-view';
-import {isEscapeKey} from '../util';
+import {isEscapeKey} from '../util/common';
 import {remove, render, replace} from '../framework/render';
 import {ActionType} from '../const';
 

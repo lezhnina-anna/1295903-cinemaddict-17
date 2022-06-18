@@ -1,5 +1,3 @@
-import {render} from './framework/render';
-import UserView from './view/user-view';
 import CardListPresenter from './presenter/card-list-presenter';
 import FilterModel from './model/filter-model';
 import FilterPresenter from './presenter/filter-presenter';
@@ -7,6 +5,7 @@ import MovieModel from './model/movie-model';
 import MovieApiService from './api-services/movie-api-service';
 import CommentModel from './model/comment-model';
 import FooterStatisticsPresenter from './presenter/footer-statistics-presenter';
+import UserPresenter from './presenter/user-presenter';
 
 const AUTHORIZATION = 'Basic IQTVDaGlHce96Tde';
 const END_POINT = 'https://17.ecmascript.pages.academy/cinemaddict';
@@ -23,8 +22,9 @@ const moviesData = {
 const cardListPresenter = new CardListPresenter(siteMainElement, moviesData, filterModel);
 const filterPresenter = new FilterPresenter(siteMainElement, filterModel, moviesData.moviesModel);
 const footerStatisticsPresenter = new FooterStatisticsPresenter(footerStatisticsElement, moviesData.moviesModel);
+const userPresenter = new UserPresenter(siteHeaderElement, moviesData.moviesModel);
 
-render(new UserView(), siteHeaderElement);
+userPresenter.init();
 filterPresenter.init();
 cardListPresenter.init();
 footerStatisticsPresenter.init();
