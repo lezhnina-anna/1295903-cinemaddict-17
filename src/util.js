@@ -10,7 +10,7 @@ const getRandomInteger = (a = 0, b = 1) => {
 
 const humanizeMovieDate = (date) => dayjs(date).format('D MMMM YYYY');
 
-const humanizeCommentDate = (date) => dayjs(date).format('YY/MM/D hh:m');
+const humanizeCommentDate = (date) => dayjs(date).format('D MMMM YYYY hh:m');
 
 const getUniqueValues = (array) => array.filter((value, index, self) => self.indexOf(value) === index);
 
