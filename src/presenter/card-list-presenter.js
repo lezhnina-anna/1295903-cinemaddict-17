@@ -83,7 +83,7 @@ export default class CardListPresenter {
         this.#moviePresenter.get(update.id).setSaving();
         await this.#moviesModel.updateMovie(UpdateType.MINOR, update)
           .catch(() => {
-            this.#moviePresenter.get(update.id).setAborting();
+            this.#moviePresenter.get(update.id).setAbortingUserAction();
           });
         break;
       case ActionType.DELETE_COMMENT:
@@ -93,7 +93,7 @@ export default class CardListPresenter {
             this.#moviesModel.updateMovie(UpdateType.PATCH, update.movie);
           })
           .catch(() => {
-            this.#moviePresenter.get(update.movie.id).setAborting();
+            this.#moviePresenter.get(update.movie.id).setAbortingDelete();
           });
         break;
       case ActionType.ADD_COMMENT:
@@ -101,9 +101,10 @@ export default class CardListPresenter {
         await this.#commentsModel.addComment(update.comment, update.movie.id)
           .then(() => {
             this.#moviesModel.updateMovie(UpdateType.PATCH, update.movie);
+            this.#moviePresenter.get(update.movie.id).onSuccessFormSend();
           })
           .catch(() => {
-            this.#moviePresenter.get(update.movie.id).setAborting();
+            this.#moviePresenter.get(update.movie.id).setAbortingForm();
           });
         break;
     }
