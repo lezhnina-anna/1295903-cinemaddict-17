@@ -10,7 +10,32 @@ const getRandomInteger = (a = 0, b = 1) => {
 
 const humanizeMovieDate = (date) => dayjs(date).format('D MMMM YYYY');
 
-const humanizeCommentDate = (date) => dayjs(date).format('YY/MM/D hh:m');
+const humanizeCommentDate = (date) => {
+  const now = dayjs();
+  const diffInMinutes = now.diff(dayjs(date), 'minute');
+  const diffInHours = now.diff(dayjs(date), 'hour');
+  const diffInDays = now.diff(dayjs(date), 'day');
+  const diffInMonth = now.diff(dayjs(date), 'month');
+  const diffInYears = now.diff(dayjs(date), 'minute');
+
+  if (diffInMinutes < 1) {
+    return 'now';
+  }
+  if (diffInHours < 1) {
+    return 'a few minutes ago';
+  }
+  if (diffInDays < 1) {
+    return `${diffInHours} hours ago`;
+  }
+  if (diffInMonth < 1) {
+    return `${diffInDays} days ago`;
+  }
+  if (diffInYears < 1) {
+    return `${diffInMonth} month ago`;
+  }
+
+  return `${diffInYears} years ago`;
+};
 
 const getUniqueValues = (array) => array.filter((value, index, self) => self.indexOf(value) === index);
 
