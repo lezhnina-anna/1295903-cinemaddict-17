@@ -4,4 +4,6 @@ const isEnterKey = (evt) => evt.key === 'Enter';
 
 const isControlKey = (evt) => evt.ctrlKey;
 
-export {isEscapeKey, isEnterKey, isControlKey};
+const isCommandKey = (evt) => evt.keyCode === 224 || evt.keyCode === 91 || evt.keyCode === 93;
+
+export {isEscapeKey, isEnterKey, isControlKey, isCommandKey};

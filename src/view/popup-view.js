@@ -1,5 +1,5 @@
 import {humanizeMovieDate, humanizeRuntime, humanizeCommentDate} from '../util/movie';
-import {isEscapeKey, isEnterKey, isControlKey} from '../util/common';
+import {isEscapeKey, isEnterKey, isControlKey, isCommandKey} from '../util/common';
 import AbstractStatefulView from '../framework/view/abstract-stateful-view';
 import he from 'he';
 
@@ -346,7 +346,7 @@ export default class PopupView extends AbstractStatefulView {
       evt.stopPropagation();
     }
 
-    if (isEnterKey(evt) && isControlKey(evt)) {
+    if (isEnterKey(evt) && (isControlKey(evt) || isCommandKey(evt))) {
       this.#addCommentHandler();
     }
   };
