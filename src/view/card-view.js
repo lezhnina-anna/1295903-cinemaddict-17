@@ -1,4 +1,4 @@
-import {formatDescription, humanizeRuntime} from '../util';
+import {formatDescription, humanizeRuntime} from '../util/movie';
 import AbstractStatefulView from '../framework/view/abstract-stateful-view';
 
 const createControlsTemplate = (userDetails, isDisabled) => {

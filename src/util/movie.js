@@ -1,12 +1,4 @@
 import dayjs from 'dayjs';
-import {FilterType} from './const';
-
-const getRandomInteger = (a = 0, b = 1) => {
-  const lower = Math.ceil(Math.min(a, b));
-  const upper = Math.floor(Math.max(a, b));
-
-  return Math.floor(lower + Math.random() * (upper - lower + 1));
-};
 
 const humanizeMovieDate = (date) => dayjs(date).format('D MMMM YYYY');
 
@@ -37,8 +29,6 @@ const humanizeCommentDate = (date) => {
   return `${diffInYears} years ago`;
 };
 
-const getUniqueValues = (array) => array.filter((value, index, self) => self.indexOf(value) === index);
-
 const humanizeRuntime = (runtime) => {
   const HOUR = 60;
 
@@ -55,16 +45,6 @@ const formatDescription = (description, maxLength) => {
 
   return `${description.substring(0, maxLength - 1)}...`;
 };
-
-const generateDate = (minDaysGap, maxDaysGap) => {
-  const daysGap = getRandomInteger(minDaysGap, maxDaysGap);
-
-  return dayjs().add(daysGap, 'day').toDate();
-};
-
-const isEscapeKey = (evt) => evt.key === 'Escape' || evt.key === 'Esc';
-
-const isEnterKey = (evt) => evt.key === 'Enter';
 
 const getWeightForNull = (valueA, valueB) => {
   if (valueA === null && valueB === null) {
@@ -100,24 +80,11 @@ const sortByRating = (movieA, movieB) => {
   return weight ?? ratingB - ratingA;
 };
 
-const filter = {
-  [FilterType.ALL]: (movies) => movies,
-  [FilterType.WATCHLIST]: (movies) => movies.filter((movie) => movie.userDetails.watchlist),
-  [FilterType.HISTORY]: (movies) => movies.filter((movie) => movie.userDetails.alreadyWatched),
-  [FilterType.FAVORITES]: (movies) => movies.filter((movie) => movie.userDetails.favorite)
-};
-
 export {
-  getRandomInteger,
   humanizeMovieDate,
-  getUniqueValues,
   humanizeRuntime,
   formatDescription,
-  generateDate,
   humanizeCommentDate,
-  isEscapeKey,
   sortByDate,
   sortByRating,
-  filter,
-  isEnterKey
 };

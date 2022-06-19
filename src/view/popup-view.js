@@ -1,4 +1,5 @@
-import {humanizeMovieDate, humanizeRuntime, humanizeCommentDate, isEscapeKey, isEnterKey} from '../util';
+import {humanizeMovieDate, humanizeRuntime, humanizeCommentDate} from '../util/movie';
+import {isEscapeKey, isEnterKey, isControlKey, isCommandKey} from '../util/common';
 import AbstractStatefulView from '../framework/view/abstract-stateful-view';
 import he from 'he';
 
@@ -182,6 +183,9 @@ const createPopupTemplate = (movie, commentsList, emoji, comment, deletingId, is
 </section>`;
 };
 
+const SHAKE_CLASS_NAME = 'shake';
+const SHAKE_ANIMATION_TIMEOUT = 600;
+
 export default class PopupView extends AbstractStatefulView {
   constructor(movie) {
     super();
@@ -208,7 +212,8 @@ export default class PopupView extends AbstractStatefulView {
     scrollTop: scroll,
     comment: '',
     deletingId: -1,
-    isDisabled: false
+    isDisabled: false,
+    lastUserAction: null
   });
 
   #setInnerHandlers() {
@@ -219,6 +224,7 @@ export default class PopupView extends AbstractStatefulView {
 
     const commentInputElement = this.element.querySelector('.film-details__comment-input');
     commentInputElement.addEventListener('keyup', this.#commentChangeHandler);
+    commentInputElement.addEventListener('keydown', this.#commentKeydownHandler);
 
     this.element.addEventListener('scroll', this.#scrollHandler);
   }
@@ -259,6 +265,49 @@ export default class PopupView extends AbstractStatefulView {
     this._callback.addComment = callback;
   };
 
+  setAbortingForm = () => {
+    this.updateElement({
+      isDisabled: false,
+    });
+
+    this.setScroll(this._state.scrollTop);
+    this.#shake(this.element.querySelector('.film-details__new-comment'));
+  };
+
+  setAbortingUserAction = () => {
+    this.updateElement({
+      isDisabled: false,
+    });
+
+    this.setScroll(this._state.scrollTop);
+    const lastUserActionButton = this.element.querySelector(`.film-details__control-button--${this._state.lastUserAction}`);
+    this.#shake(lastUserActionButton);
+  };
+
+  setAbortingDelete = () => {
+    const deletingId = this._state.deletingId;
+    this.updateElement({
+      isDisabled: false,
+      deletingId: -1
+    });
+
+    const clickedDeletingElement = this.element.querySelector(`[data-id="${deletingId}"]`);
+    this.setScroll(this._state.scrollTop);
+    this.#shake(clickedDeletingElement);
+  };
+
+  onSuccessFormSend = () => {
+    this.updateElement({...this._state, comment: '', emoji: ''});
+    this.setScroll(this._state.scrollTop);
+  };
+
+  #shake(element) {
+    element.classList.add(SHAKE_CLASS_NAME);
+    setTimeout(() => {
+      this.element.classList.remove(SHAKE_CLASS_NAME);
+    }, SHAKE_ANIMATION_TIMEOUT);
+  }
+
   #closeButtonClickHandler = (evt) => {
     evt.preventDefault();
     this._callback.closeButtonClick();
@@ -266,16 +315,19 @@ export default class PopupView extends AbstractStatefulView {
 
   #favoriteClickHandler = (evt) => {
     evt.preventDefault();
+    this._setState({...this._state, lastUserAction: 'favorite'});
     this._callback.favoriteClick();
   };
 
   #watchedClickHandler = (evt) => {
     evt.preventDefault();
+    this._setState({...this._state, lastUserAction: 'watched'});
     this._callback.watchedClick();
   };
 
   #watchlistClickHandler = (evt) => {
     evt.preventDefault();
+    this._setState({...this._state, lastUserAction: 'watchlist'});
     this._callback.watchlistClick();
   };
 
@@ -289,16 +341,17 @@ export default class PopupView extends AbstractStatefulView {
     this.setScroll(this._state.scrollTop);
   };
 
-  #commentChangeHandler = (evt) => {
+  #commentKeydownHandler = (evt) => {
     if (isEscapeKey(evt)) {
       evt.stopPropagation();
     }
 
-    if (isEnterKey(evt)) {
+    if (isEnterKey(evt) && (isControlKey(evt) || isCommandKey(evt))) {
       this.#addCommentHandler();
-      return;
     }
+  };
 
+  #commentChangeHandler = (evt) => {
     this._setState({
       comment: evt.target.value
     });
@@ -311,8 +364,6 @@ export default class PopupView extends AbstractStatefulView {
       date: new Date(),
       author: 'my name'
     });
-    this.updateElement({...this._state, comment: '', emoji: ''});
-    this.setScroll(this._state.scrollTop);
   };
 
   #scrollHandler = (evt) => {

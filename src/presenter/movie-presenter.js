@@ -1,6 +1,6 @@
 import CardView from '../view/card-view';
 import PopupView from '../view/popup-view';
-import {isEscapeKey} from '../util';
+import {isEscapeKey} from '../util/common';
 import {remove, render, replace} from '../framework/render';
 import {ActionType} from '../const';
 
@@ -80,17 +80,7 @@ export default class MoviePresenter {
     this.#popupComponent.setScroll(scrollTop);
   };
 
-  setAborting = () => {
-    const resetFormState = () => {
-      const scrollTop = this.#popupComponent.getScroll();
-      this.#popupComponent.updateElement({
-        isDisabled: false,
-        deletingId: -1,
-        scrollTop
-      });
-      this.#popupComponent.setScroll(scrollTop);
-    };
-
+  setAbortingUserAction = () => {
     const resetCardState = () => {
       this.#movieComponent.updateElement({
         isDisabled: false,
@@ -98,10 +88,22 @@ export default class MoviePresenter {
     };
 
     if (document.body.contains(this.#popupComponent.element)) {
-      this.#popupComponent.shake(resetFormState);
+      this.#popupComponent.setAbortingUserAction();
     } else {
       this.#movieComponent.shake(resetCardState);
     }
+  };
+
+  setAbortingForm = () => {
+    this.#popupComponent.setAbortingForm();
+  };
+
+  setAbortingDelete = () => {
+    this.#popupComponent.setAbortingDelete();
+  };
+
+  onSuccessFormSend = () => {
+    this.#popupComponent.onSuccessFormSend();
   };
 
   resetView = () => {
