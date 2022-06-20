@@ -20,14 +20,6 @@ export default class SortView extends AbstractView {
     return createSortTemplate(this.#sortType);
   }
 
-  set sortType(sortType) {
-    this.#sortType = sortType;
-  }
-
-  get sortType() {
-    return this.#sortType;
-  }
-
   setSortTypeChangeHandler = (callback) => {
     this._callback.sortTypeChange = callback;
     this.element.addEventListener('click', this.#sortTypeChangeHandler);

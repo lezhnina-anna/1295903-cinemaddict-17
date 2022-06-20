@@ -45,7 +45,7 @@ export default class CardListPresenter {
   }
 
   get movies() {
-    this.#filterType = this.#filterModel.filter;
+    this.#filterType = this.#filterModel.moviesFilter;
     const movies = this.#moviesModel.movies;
     const filteredMovies = filter[this.#filterType](movies);
 

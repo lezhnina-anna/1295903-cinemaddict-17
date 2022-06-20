@@ -197,6 +197,14 @@ export default class PopupView extends AbstractStatefulView {
     return createPopupTemplate(this._state.movie, this._state.comments, this._state.emoji, this._state.comment, this._state.deletingId, this._state.isDisabled);
   }
 
+  get scroll() {
+    return this._state.scrollTop;
+  }
+
+  set scroll(scroll) {
+    this.element.scrollTop = scroll;
+  }
+
   _restoreHandlers = () => {
     this.#setInnerHandlers();
     this.setCloseButtonClickHandler(this._callback.closeButtonClick);
@@ -205,29 +213,9 @@ export default class PopupView extends AbstractStatefulView {
     this.setWatchlistClickHandler(this._callback.watchlistClick);
   };
 
-  static parseDataToState = (movie, scroll) => ({
-    movie: movie,
-    comments: [],
-    emoji: '',
-    scrollTop: scroll,
-    comment: '',
-    deletingId: -1,
-    isDisabled: false,
-    lastUserAction: null
-  });
-
-  #setInnerHandlers() {
-    const emoji = this.element.querySelectorAll('.film-details__emoji-item');
-    for (const emojiItem of emoji) {
-      emojiItem.addEventListener('change', this.#emojiClickHandler);
-    }
-
-    const commentInputElement = this.element.querySelector('.film-details__comment-input');
-    commentInputElement.addEventListener('keyup', this.#commentChangeHandler);
-    commentInputElement.addEventListener('keydown', this.#commentKeydownHandler);
-
-    this.element.addEventListener('scroll', this.#scrollHandler);
-  }
+  reset = () => {
+    this.updateElement({...this._state, emoji: '', scrollTop: 0, comment: ''});
+  };
 
   setComments = (comments) => {
     this.updateElement({comments: comments});
@@ -270,7 +258,7 @@ export default class PopupView extends AbstractStatefulView {
       isDisabled: false,
     });
 
-    this.setScroll(this._state.scrollTop);
+    this.scroll = this._state.scrollTop;
     this.#shake(this.element.querySelector('.film-details__new-comment'));
   };
 
@@ -279,7 +267,7 @@ export default class PopupView extends AbstractStatefulView {
       isDisabled: false,
     });
 
-    this.setScroll(this._state.scrollTop);
+    this.scroll = this._state.scrollTop;
     const lastUserActionButton = this.element.querySelector(`.film-details__control-button--${this._state.lastUserAction}`);
     this.#shake(lastUserActionButton);
   };
@@ -292,14 +280,27 @@ export default class PopupView extends AbstractStatefulView {
     });
 
     const clickedDeletingElement = this.element.querySelector(`[data-id="${deletingId}"]`);
-    this.setScroll(this._state.scrollTop);
+    this.scroll = this._state.scrollTop;
     this.#shake(clickedDeletingElement);
   };
 
   onSuccessFormSend = () => {
     this.updateElement({...this._state, comment: '', emoji: ''});
-    this.setScroll(this._state.scrollTop);
+    this.scroll = this._state.scrollTop;
   };
+
+  #setInnerHandlers() {
+    const emoji = this.element.querySelectorAll('.film-details__emoji-item');
+    for (const emojiItem of emoji) {
+      emojiItem.addEventListener('change', this.#emojiClickHandler);
+    }
+
+    const commentInputElement = this.element.querySelector('.film-details__comment-input');
+    commentInputElement.addEventListener('keyup', this.#commentChangeHandler);
+    commentInputElement.addEventListener('keydown', this.#commentKeydownHandler);
+
+    this.element.addEventListener('scroll', this.#scrollHandler);
+  }
 
   #shake(element) {
     element.classList.add(SHAKE_CLASS_NAME);
@@ -338,7 +339,7 @@ export default class PopupView extends AbstractStatefulView {
     });
 
     this.element.querySelector(`#emoji-${this._state.emoji}`).checked = true;
-    this.setScroll(this._state.scrollTop);
+    this.scroll = this._state.scrollTop;
   };
 
   #commentKeydownHandler = (evt) => {
@@ -375,13 +376,14 @@ export default class PopupView extends AbstractStatefulView {
     this._callback.deleteCommentClick(evt.target.dataset.id);
   };
 
-  setScroll = (scroll) => {
-    this.element.scrollTop = scroll;
-  };
-
-  getScroll = () => this._state.scrollTop;
-
-  reset = () => {
-    this.updateElement({...this._state, emoji: '', scrollTop: 0, comment: ''});
-  };
+  static parseDataToState = (movie, scroll) => ({
+    movie: movie,
+    comments: [],
+    emoji: '',
+    scrollTop: scroll,
+    comment: '',
+    deletingId: -1,
+    isDisabled: false,
+    lastUserAction: null
+  });
 }

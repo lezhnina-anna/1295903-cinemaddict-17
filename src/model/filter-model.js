@@ -4,11 +4,11 @@ import {FilterType} from '../const';
 export default class FilterModel extends Observable {
   #filter = FilterType.ALL;
 
-  get filter() {
+  get moviesFilter() {
     return this.#filter;
   }
 
-  setFilter = (updateType, filter) => {
+  setMoviesFilter = (updateType, filter) => {
     this.#filter = filter;
     this._notify(updateType, filter);
   };

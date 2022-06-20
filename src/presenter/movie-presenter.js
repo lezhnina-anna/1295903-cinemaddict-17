@@ -29,7 +29,7 @@ export default class MoviePresenter {
 
     const prevMovieComponent = this.#movieComponent;
     const prevPopupComponent = this.#popupComponent;
-    const scrollTop = prevPopupComponent ? prevPopupComponent.getScroll() : 0;
+    const scrollTop = prevPopupComponent ? prevPopupComponent.scroll : 0;
 
     this.#movieComponent = new CardView(movie);
     this.#popupComponent = new PopupView(movie);
@@ -53,7 +53,7 @@ export default class MoviePresenter {
         .finally(() => {
           this.#popupComponent.setComments(this.#commentsModel.comments);
           replace(this.#popupComponent, prevPopupComponent);
-          this.#popupComponent.setScroll(scrollTop);
+          this.#popupComponent.scroll = scrollTop;
           this.#initPopupHandlers();
         });
     }
@@ -62,22 +62,22 @@ export default class MoviePresenter {
   };
 
   setDeleting = (id) => {
-    const scrollTop = this.#popupComponent.getScroll();
+    const scrollTop = this.#popupComponent.scroll;
     this.#popupComponent.updateElement({
       isDisabled: true,
       deletingId: id,
       scrollTop
     });
-    this.#popupComponent.setScroll(scrollTop);
+    this.#popupComponent.scroll = scrollTop;
   };
 
   setSaving = () => {
-    const scrollTop = this.#popupComponent.getScroll();
+    const scrollTop = this.#popupComponent.scroll;
     this.#popupComponent.updateElement({
       isDisabled: true,
       scrollTop
     });
-    this.#popupComponent.setScroll(scrollTop);
+    this.#popupComponent.scroll = scrollTop;
   };
 
   setAbortingUserAction = () => {
