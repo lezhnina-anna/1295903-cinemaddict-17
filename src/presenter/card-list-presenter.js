@@ -80,11 +80,15 @@ export default class CardListPresenter {
     this.#uiBlocker.block();
     switch (actionType) {
       case ActionType.UPDATE_MOVIE:
-        this.#moviePresenter.get(update.id).setSaving();
-        await this.#moviesModel.updateMovie(UpdateType.MINOR, update)
-          .catch(() => {
-            this.#moviePresenter.get(update.id).setAbortingUserAction();
-          });
+        this.#moviePresenter.get(update.movie.id).setSaving();
+        await this.#moviesModel.updateMovie(
+          update.filterType === this.#filterType
+            ? UpdateType.MINOR
+            : UpdateType.PATCH,
+          update.movie
+        ).catch(() => {
+          this.#moviePresenter.get(update.movie.id).setAbortingUserAction();
+        });
         break;
       case ActionType.DELETE_COMMENT:
         this.#moviePresenter.get(update.movie.id).setDeleting(update.commentId);

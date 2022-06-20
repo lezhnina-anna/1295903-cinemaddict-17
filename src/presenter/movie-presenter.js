@@ -2,7 +2,7 @@ import CardView from '../view/card-view';
 import PopupView from '../view/popup-view';
 import {isEscapeKey} from '../util/common';
 import {remove, render, replace} from '../framework/render';
-import {ActionType} from '../const';
+import {ActionType, FilterType} from '../const';
 
 const POPUP_OPEN_CLASSNAME = 'hide-overflow';
 
@@ -115,6 +115,7 @@ export default class MoviePresenter {
   destroy = () => {
     remove(this.#movieComponent);
     remove(this.#popupComponent);
+    document.body.classList.remove(POPUP_OPEN_CLASSNAME);
   };
 
   #closePopup = () => {
@@ -146,30 +147,35 @@ export default class MoviePresenter {
 
   #initPopupHandlers = () => {
     this.#popupComponent.setCloseButtonClickHandler(this.#closePopup);
-    this.#popupComponent.setWatchedClickHandler(this.#handleWatchedClick);
-    this.#popupComponent.setFavoriteClickHandler(() => this.#handleControlClick('favorite'));
-    this.#popupComponent.setWatchlistClickHandler(() => this.#handleControlClick('watchlist'));
+    this.#popupComponent.setWatchedClickHandler(() => this.#handleWatchedClick(FilterType.HISTORY));
+    this.#popupComponent.setFavoriteClickHandler(() => this.#handleControlClick('favorite', FilterType.FAVORITES));
+    this.#popupComponent.setWatchlistClickHandler(() => this.#handleControlClick('watchlist', FilterType.WATCHLIST));
     this.#popupComponent.setDeleteCommentClickHandler(this.#handleDeleteCommentClick);
     this.#popupComponent.setAddCommentHandler(this.#handleAddComment);
   };
 
-  #handleControlClick = (controlName) => {
+  #handleControlClick = (controlName, filterType) => {
     this.#changeData(ActionType.UPDATE_MOVIE, {
-      ...this.#movie,
-      userDetails: {
-        ...this.#movie.userDetails,
-        [controlName]: !this.#movie.userDetails[controlName],
+      filterType,
+      movie: {
+        ...this.#movie,
+        userDetails: {
+          ...this.#movie.userDetails,
+          [controlName]: !this.#movie.userDetails[controlName],
+        }
       }
     });
   };
 
-  #handleWatchedClick = () => {
+  #handleWatchedClick = (filterType) => {
     const alreadyWatched = !this.#movie.userDetails.alreadyWatched;
     const watchingDate = alreadyWatched ? new Date() : null;
     this.#changeData(ActionType.UPDATE_MOVIE, {
-      ...this.#movie,
-      userDetails: {...this.#movie.userDetails, alreadyWatched, watchingDate}
-    });
+      filterType,
+      movie: {
+        ...this.#movie,
+        userDetails: {...this.#movie.userDetails, alreadyWatched, watchingDate}
+      }});
   };
 
   #handleDeleteCommentClick = (id) => {
