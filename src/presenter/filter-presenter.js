@@ -22,7 +22,6 @@ export default class FilterPresenter {
   get filters() {
     const movies = this.#moviesModel.movies;
 
-
     return [
       {
         type: FilterType.ALL,
@@ -72,6 +71,6 @@ export default class FilterPresenter {
       return;
     }
 
-    this.#filterModel.setFilter(UpdateType.MAJOR, filterType);
+    this.#filterModel.setMoviesFilter(UpdateType.MAJOR, filterType);
   };
 }

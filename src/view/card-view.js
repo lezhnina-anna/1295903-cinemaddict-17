@@ -53,11 +53,6 @@ export default class CardView extends AbstractStatefulView {
     this._state = CardView.parseDataToState(movie);
   }
 
-  static parseDataToState = (movie) => ({
-    movie: movie,
-    isDisabled: false
-  });
-
   get template() {
     return createCardTemplate(this._state.movie, this._state.isDisabled);
   }
@@ -103,4 +98,9 @@ export default class CardView extends AbstractStatefulView {
     evt.preventDefault();
     this._callback.watchlistClick();
   };
+
+  static parseDataToState = (movie) => ({
+    movie: movie,
+    isDisabled: false
+  });
 }
