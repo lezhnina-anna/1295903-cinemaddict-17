@@ -105,7 +105,7 @@ export default class CardListPresenter {
         await this.#commentsModel.addComment(update.comment, update.movie.id)
           .then(() => {
             this.#moviesModel.updateMovie(UpdateType.PATCH, update.movie);
-            this.#moviePresenter.get(update.movie.id).onSuccessFormSend();
+            this.#moviePresenter.get(update.movie.id).successFormSendHandler();
           })
           .catch(() => {
             this.#moviePresenter.get(update.movie.id).setAbortingForm();
@@ -147,7 +147,7 @@ export default class CardListPresenter {
     }
 
     this.#sortType = sortType;
-    this.#clearCardList();
+    this.#clearCardList({resetRenderedCardCount: true});
     this.#renderCardList();
   };
 

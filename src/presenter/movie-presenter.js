@@ -102,8 +102,8 @@ export default class MoviePresenter {
     this.#popupComponent.setAbortingDelete();
   };
 
-  onSuccessFormSend = () => {
-    this.#popupComponent.onSuccessFormSend();
+  successFormSendHandler = () => {
+    this.#popupComponent.successFormSendHandler();
   };
 
   resetView = () => {

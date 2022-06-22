@@ -284,7 +284,7 @@ export default class PopupView extends AbstractStatefulView {
     this.#shake(clickedDeletingElement);
   };
 
-  onSuccessFormSend = () => {
+  successFormSendHandler = () => {
     this.updateElement({...this._state, comment: '', emoji: ''});
     this.scroll = this._state.scrollTop;
   };
